@@ -48,7 +48,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 .clbl{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--fgd);font-weight:600;margin-bottom:.9rem}
 
 /* Room code */
-.code-d{font-family:'Syne',sans-serif;font-size:3.4rem;font-weight:800;letter-spacing:.28em;color:var(--neon);text-shadow:0 0 28px rgba(221,214,254,.35);display:block;text-align:center;margin:.2rem 0 .55rem;cursor:pointer;user-select:all}
+.code-d{font-family:'Syne',sans-serif;font-size:clamp(1.75rem,10vw,3.2rem);font-weight:800;letter-spacing:clamp(.12em,.5vw,.22em);color:var(--neon);text-shadow:0 0 28px rgba(221,214,254,.35);display:flex;justify-content:center;align-items:center;gap:clamp(4px,1.5vw,10px);margin:.2rem 0 .55rem;cursor:pointer;user-select:all;overflow:visible;width:100%}
+.code-d span{display:inline-block;min-width:0}
 .code-d:active{transform:scale(.97)}
 .code-h{font-size:.78rem;color:var(--fgm);line-height:1.55;text-align:center}
 .cacts{display:flex;gap:.55rem;justify-content:center;margin-top:.9rem;flex-wrap:wrap}
@@ -351,7 +352,7 @@ function getOTP(){return [...document.getElementById('otp').children].map(i=>i.v
 function focusJoin(){document.getElementById('jcard').scrollIntoView({behavior:'smooth'});setTimeout(()=>document.getElementById('otp').children[0]?.focus(),300)}
 
 /* ── State ─────────────────────────────────────────────────── */
-const PFX='nxs-',CHUNK=65536;
+const PFX='nxs-',CHUNK=262144; // 256KB chunks for maximum LAN throughput
 const NAMES=['Cosmic Fox','Nova Wolf','Stellar Cat','Pulsar Bear','Zenith Lynx','Orbit Hawk','Nebula Raven','Quasar Tiger'];
 const AVS=['💻','📱','🖥️','⌚','🎮','📡','🖨️','📟'];
 const myName=NAMES[Math.floor(Math.random()*NAMES.length)];
@@ -446,7 +447,12 @@ function handleHostData(m,pid,c){
     members[pid]={name:m.name,av:m.av||'📱'};
     const upd={t:'upd',id:pid,name:m.name,av:m.av||'📱'};
     Object.entries(hostConns).forEach(([k,v])=>{if(k!==pid)v.send(JSON.stringify(upd))});
-    refreshList();toast('📱 '+m.name+' joined!');
+    refreshList();
+    toast('📱 '+m.name+' joined!');
+    // Auto-enter room screen if host is still on lobby
+    if(!document.getElementById('sr').classList.contains('active')){
+      enterRoom(myCode);
+    }
   } else handleFileMsg(m,pid,c);
 }
 
@@ -606,7 +612,7 @@ async function sendChunks(c,f,tid){
   setXfer(tid,'send',0,0);
   const tot=Math.ceil(f.size/CHUNK);let sent=0;const t0=Date.now();
   for(let i=0;i<tot;i++){
-    if(c.dataChannel)while(c.dataChannel.bufferedAmount>1.5*1024*1024)await slp(20);
+    if(c.dataChannel)while(c.dataChannel.bufferedAmount>16*1024*1024)await slp(10);
     const buf=await f.slice(i*CHUNK,(i+1)*CHUNK).arrayBuffer();
     c.send(buf);sent+=buf.byteLength;
     const pct=Math.round(sent/f.size*100);
@@ -707,8 +713,10 @@ function showSc(id){document.querySelectorAll('.screen').forEach(s=>s.classList.
 function setStatus(t){document.getElementById('ist').textContent=t}
 
 function showLobby(){
-  document.getElementById('mycode').textContent=myCode||'------';
-  document.getElementById('msgcode').textContent=myCode||'------';
+  const code=myCode||'------';
+  const el=document.getElementById('mycode');
+  el.innerHTML=code.split('').map(c=>`<span>${c}</span>`).join('');
+  document.getElementById('msgcode').textContent=code;
   genQR();showSc('sl');
 }
 
