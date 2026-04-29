@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NEXSHARE · Local File Transfer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#04040F;--bg2:#07071A;
+  --sf:rgba(110,50,210,.08);--sf2:rgba(110,50,210,.14);
+  --bd:rgba(150,80,255,.16);--bdh:rgba(168,85,247,.5);
+  --p1:#9333EA;--p2:#A855F7;--p3:#C084FC;
+  --neon:#DDD6FE;--fg:#EDE9FF;--fgm:rgba(237,233,255,.5);--fgd:rgba(237,233,255,.22);
+  --ok:#34D399;--err:#F87171;--warn:#FBBF24;
+  --gs:0 0 16px rgba(147,51,234,.4);--gm:0 0 40px rgba(147,51,234,.45),0 0 80px rgba(147,51,234,.15);
+  --r:14px;--r2:22px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-height:100dvh;overflow-x:hidden}
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* Screens */
+.screen{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;align-items:center;overflow-y:auto}
+.screen.active{display:flex}
+
+/* ── Init ── */
+#si{justify-content:center;align-items:center;gap:1.2rem;background:var(--bg)}
+.il{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;letter-spacing:.18em;background:linear-gradient(135deg,#C084FC,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
+.ir{width:44px;height:44px;border:2px solid var(--bd);border-top-color:var(--p2);border-radius:50%;animation:spin .85s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.it{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--fgm)}
+
+/* ── Lobby ── */
+#sl{padding:2rem 1.25rem 3rem;justify-content:flex-start;align-items:center}
+.lw{width:100%;max-width:460px;display:flex;flex-direction:column;gap:1rem}
+.logo{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:.14em;background:linear-gradient(135deg,#C084FC,#9333EA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center}
+.tag{text-align:center;font-size:.78rem;color:var(--fgm);letter-spacing:.05em;margin-top:.1rem;margin-bottom:.2rem}
+
+/* Card */
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:1.4rem 1.5rem;position:relative;overflow:hidden;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:border-color .3s,box-shadow .3s}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,.35),transparent)}
+.clbl{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--fgd);font-weight:600;margin-bottom:.9rem}
+
+/* Room code */
+.code-d{font-family:'Syne',sans-serif;font-size:3.4rem;font-weight:800;letter-spacing:.28em;color:var(--neon);text-shadow:0 0 28px rgba(221,214,254,.35);display:block;text-align:center;margin:.2rem 0 .55rem;cursor:pointer;user-select:all}
+.code-d:active{transform:scale(.97)}
+.code-h{font-size:.78rem;color:var(--fgm);line-height:1.55;text-align:center}
+.cacts{display:flex;gap:.55rem;justify-content:center;margin-top:.9rem;flex-wrap:wrap}
+
+/* QR row */
+.qrow{display:flex;gap:1.2rem;align-items:center}
+#qwrap{background:#fff;padding:8px;border-radius:10px;box-shadow:0 0 22px rgba(147,51,234,.3);flex-shrink:0}
+#qwrap canvas,#qwrap img{display:block}
+.qinfo p{font-size:.8rem;color:var(--fgm);line-height:1.6;margin-bottom:.7rem}
+
+/* Divider */
+.div{text-align:center;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--fgd);position:relative}
+.div::before,.div::after{content:'';position:absolute;top:50%;width:calc(50% - 4rem);height:1px;background:var(--bd)}
+.div::before{left:0}.div::after{right:0}
+
+/* OTP */
+.otp{display:flex;gap:.4rem;justify-content:center;margin-bottom:.9rem}
+.cb{width:42px;height:52px;background:rgba(0,0,0,.35);border:1.5px solid var(--bd);border-radius:var(--r);color:var(--fg);font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:700;text-align:center;text-transform:uppercase;outline:none;transition:all .2s;caret-color:var(--p2)}
+.cb:focus{border-color:var(--p2);box-shadow:0 0 0 3px rgba(168,85,247,.15)}
+@media(max-width:360px){.cb{width:36px;height:46px;font-size:1.2rem}.otp{gap:.3rem}}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:.36rem;padding:.52rem 1.05rem;border-radius:var(--r);border:1px solid var(--bd);background:var(--sf2);color:var(--fg);font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;transition:all .22s;white-space:nowrap}
+.btn:hover{border-color:var(--bdh);background:rgba(120,60,220,.2);box-shadow:var(--gs);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.bp{background:linear-gradient(135deg,var(--p1),#6D28D9);border-color:transparent;color:#fff;font-weight:600}
+.bp:hover{background:linear-gradient(135deg,var(--p2),var(--p1));box-shadow:var(--gm)}
+.blg{padding:.72rem 2rem;font-size:.92rem;border-radius:var(--r2);width:100%;justify-content:center}
+.bsm{padding:.35rem .75rem;font-size:.72rem}
+.bgh{background:transparent;border-color:var(--fgd);color:var(--fgm)}
+.bgh:hover{border-color:var(--bd);color:var(--fg);background:var(--sf)}
+
+/* ── Room Screen ── */
+#sr{padding:0;justify-content:flex-start;align-items:stretch}
+.rhdr{display:flex;align-items:center;gap:.7rem;padding:.9rem 1.1rem;background:rgba(4,4,15,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--bd);flex-shrink:0;position:sticky;top:0;z-index:20}
+.rlogo{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;letter-spacing:.12em;background:linear-gradient(135deg,#C084FC,#9333EA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rbadge{display:flex;align-items:center;gap:.4rem;padding:.25rem .7rem;background:var(--sf);border:1px solid var(--bd);border-radius:100px;font-size:.68rem}
+.rcode{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--neon);letter-spacing:.1em}
+.hright{margin-left:auto;display:flex;align-items:center;gap:.55rem}
+.opill{display:flex;align-items:center;gap:.38rem;font-size:.7rem;color:var(--fgm)}
+.don{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.dpulse{width:7px;height:7px;border-radius:50%;background:var(--warn);animation:blink 1s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.rbody{flex:1;padding:1.1rem;display:flex;flex-direction:column;gap:1rem;max-width:600px;width:100%;margin:0 auto}
+
+/* Section label */
+.slbl{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--fgd);font-weight:600;display:flex;align-items:center;gap:.55rem;margin-bottom:.65rem}
+.slbl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bd),transparent)}
+.cbadge{background:rgba(168,85,247,.12);color:var(--p3);padding:.08rem .42rem;border-radius:100px;font-size:.7rem;font-weight:600}
+
+/* Device grid */
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:.6rem}
+.dcard{background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r2);padding:1rem .8rem;text-align:center;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;animation:fadeUp .35s ease}
+.dcard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,.3),transparent)}
+.dcard:hover{border-color:var(--bdh);box-shadow:var(--gs);transform:translateY(-2px)}
+.dcard.sel{border-color:var(--p2);background:rgba(168,85,247,.12);box-shadow:var(--gm)}
+.dcard.sel::after{content:'✓';position:absolute;top:.45rem;right:.55rem;font-size:.65rem;background:var(--p1);color:#fff;width:17px;height:17px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+.dav{font-size:2rem;margin-bottom:.5rem;display:block;filter:drop-shadow(0 0 8px rgba(168,85,247,.4))}
+.dn{font-size:.78rem;font-weight:600;line-height:1.3;word-break:break-word}
+.dt{font-size:.65rem;color:var(--fgm);margin-top:.18rem}
+.dc{font-size:.62rem;color:var(--ok);margin-top:.25rem}
+.nodmsg{grid-column:1/-1;text-align:center;padding:1.75rem;color:var(--fgd);font-size:.82rem;border:1px dashed var(--bd);border-radius:var(--r2);line-height:1.75}
+.nodmsg strong{color:var(--fgm)}
+
+/* Selected bar */
+.sbar{display:flex;align-items:center;gap:.7rem;padding:.65rem .9rem;background:rgba(168,85,247,.1);border:1px solid var(--bdh);border-radius:var(--r);font-size:.82rem}
+.sbar strong{color:var(--neon)}
+.sbar .sc{margin-left:auto}
+
+/* Drop zone */
+.dz{border:2px dashed var(--bd);border-radius:var(--r2);padding:2.2rem 1.25rem;text-align:center;transition:all .3s;position:relative;overflow:hidden}
+.dz.adz{border-color:var(--p2);background:rgba(168,85,247,.07);box-shadow:var(--gm)}
+.dz.rdy{cursor:pointer}
+.dz.dis{opacity:.4;cursor:not-allowed}
+.dico{font-size:2.5rem;display:block;margin-bottom:.65rem;animation:flt 3s ease-in-out infinite}
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.dtit{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:.35rem}
+.dsub{font-size:.78rem;color:var(--fgm);line-height:1.5}
+.dzb{margin-top:1rem}
+
+/* Transfers */
+.tlist{display:flex;flex-direction:column;gap:.55rem}
+.ti{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:.85rem 1rem;display:flex;align-items:center;gap:.8rem;position:relative;overflow:hidden;animation:fadeUp .3s ease}
+.ti.inc{border-color:rgba(52,211,153,.2)}
+.ti.dn{border-color:rgba(52,211,153,.35)}
+.ti.fl{border-color:rgba(248,113,113,.3)}
+.tbg{position:absolute;left:0;top:0;bottom:0;background:rgba(168,85,247,.05);transition:width .15s;pointer-events:none}
+.tico{font-size:1.5rem;flex-shrink:0}
+.tinf{flex:1;min-width:0}
+.tnm{font-weight:500;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tmt{font-size:.68rem;color:var(--fgm);display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.12rem}
+.tbar{height:3px;background:rgba(255,255,255,.06);border-radius:100px;margin-top:.42rem;overflow:hidden}
+.tfil{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--p1),var(--p2));transition:width .15s;box-shadow:0 0 8px var(--p1)}
+.tfil.dn{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.tbdg{font-size:.66rem;font-weight:600;padding:.2rem .5rem;border-radius:100px;background:rgba(168,85,247,.12);color:var(--p3);min-width:3.5rem;text-align:center;flex-shrink:0}
+.tbdg.dn{background:rgba(52,211,153,.12);color:var(--ok)}
+.tbdg.fl{background:rgba(248,113,113,.12);color:var(--err)}
+
+/* Modal */
+#mw{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
+#mw.show{display:flex}
+.mback{position:absolute;inset:0;background:rgba(4,4,15,.85);backdrop-filter:blur(8px)}
+.mbox{position:relative;z-index:1;background:#0A0920;border:1px solid var(--bdh);border-radius:var(--r2);padding:2rem 1.75rem;max-width:360px;width:100%;text-align:center;box-shadow:var(--gm),0 24px 60px rgba(0,0,0,.6);animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.85) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mico{font-size:3.2rem;margin-bottom:.7rem;display:block}
+.mtit{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:.35rem}
+.mfrm{font-size:.78rem;color:var(--fgm);margin-bottom:.2rem}
+.mfl{font-size:.9rem;font-weight:600;color:var(--neon);word-break:break-all;margin-bottom:.2rem}
+.msz{font-size:.75rem;color:var(--fgm);margin-bottom:1.4rem}
+.mbtns{display:flex;gap:.65rem;justify-content:center}
+
+/* Toast */
+#tc{position:fixed;bottom:1.1rem;right:1.1rem;z-index:200;display:flex;flex-direction:column;gap:.45rem;pointer-events:none}
+.toast{background:rgba(12,10,28,.95);border:1px solid var(--bdh);border-radius:var(--r);padding:.65rem 1rem;font-size:.78rem;max-width:260px;box-shadow:var(--gs),0 8px 24px rgba(0,0,0,.5);backdrop-filter:blur(20px);animation:tIn .3s ease;pointer-events:auto;display:flex;align-items:center;gap:.45rem}
+.toast.ok{border-color:rgba(52,211,153,.4)}
+.toast.er{border-color:rgba(248,113,113,.35)}
+@keyframes tIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:100px}
+</style>
+</head>
+<body>
+<canvas id="bgc"></canvas>
+
+<!-- INIT -->
+<div id="si" class="screen active">
+  <div class="il">NEXSHARE</div>
+  <div class="ir"></div>
+  <div class="it" id="ist">Setting up…</div>
+</div>
+
+<!-- LOBBY -->
+<div id="sl" class="screen">
+  <div class="lw">
+    <div class="logo">NEXSHARE</div>
+    <div class="tag">Instant local file sharing — no cables, no accounts</div>
+
+    <!-- Your Room Code -->
+    <div class="card">
+      <div class="clbl">📡 Your Room Code</div>
+      <span class="code-d" id="mycode" title="Tap to copy" onclick="copyCode()">······</span>
+      <div class="code-h">Share this 6-letter code with any device on the same WiFi.<br>They enter it — and appear on your screen instantly.</div>
+      <div class="cacts">
+        <button class="btn bsm" onclick="copyCode()">⎘ Copy Code</button>
+        <button class="btn bsm" onclick="shareLink()">🔗 Share Link</button>
+      </div>
+    </div>
+
+    <!-- QR -->
+    <div class="card">
+      <div class="clbl">📷 Scan to Join Instantly</div>
+      <div class="qrow">
+        <div id="qwrap"></div>
+        <div class="qinfo">
+          <p>Open the camera on another device and scan this QR — it auto-joins your room. No typing needed.</p>
+          <button class="btn bsm bgh" onclick="focusJoin()">Or type a code →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="div">— join someone else's room —</div>
+
+    <!-- Join -->
+    <div class="card" id="jcard">
+      <div class="clbl">🔑 Enter Room Code</div>
+      <div class="otp" id="otp"></div>
+      <button class="btn bp blg" onclick="joinFromOTP()">Join Room →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ROOM -->
+<div id="sr" class="screen">
+  <div class="rhdr">
+    <span class="rlogo">NXS</span>
+    <div class="rbadge">Room&nbsp;<span class="rcode" id="hcode">——</span></div>
+    <div class="hright">
+      <div class="opill">
+        <div class="don" id="cdot"></div>
+        <span id="ccount">0 devices</span>
+      </div>
+      <button class="btn bsm bgh" onclick="leaveRoom()">Leave</button>
+    </div>
+  </div>
+
+  <div class="rbody">
+    <!-- Devices -->
+    <div>
+      <div class="slbl">Devices in Room <span class="cbadge" id="dcount">0</span></div>
+      <div class="dgrid" id="dgrid">
+        <div class="nodmsg" id="nodmsg">
+          Waiting for others…<br>
+          <strong>Share your code or let them scan the QR!</strong><br>
+          <span style="font-size:.72rem">They open this page and enter <strong id="msgcode">——</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected bar -->
+    <div id="sbar" class="sbar" style="display:none">
+      <span id="sav" style="font-size:1.2rem">📱</span>
+      <span>Sending to <strong id="snm">—</strong></span>
+      <button class="btn bsm bgh sc" onclick="clearSel()">✕ Clear</button>
+    </div>
+
+    <!-- Drop zone -->
+    <div id="dzone" class="dz dis">
+      <span class="dico" id="dico">📡</span>
+      <div class="dtit" id="dtit">Select a device above</div>
+      <div class="dsub" id="dsub">Tap a device card, then drop files here</div>
+      <div class="dzb" id="dzb" style="display:none">
+        <button class="btn bp" onclick="pickFiles()">Choose Files</button>
+      </div>
+    </div>
+    <input type="file" id="finput" multiple style="display:none" onchange="onPick(this.files)">
+
+    <!-- Transfers -->
+    <div id="twrap" style="display:none">
+      <div class="slbl">Transfers</div>
+      <div class="tlist" id="tlist"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="mw">
+  <div class="mback" onclick="decFile()"></div>
+  <div class="mbox">
+    <span class="mico" id="mico">📥</span>
+    <div class="mtit">Incoming File</div>
+    <div class="mfrm" id="mfrm">From: Unknown</div>
+    <div class="mfl" id="mfl">file.zip</div>
+    <div class="msz" id="msz"></div>
+    <div class="mbtns">
+      <button class="btn" onclick="decFile()">✕ Decline</button>
+      <button class="btn bp" onclick="accFile()">↓ Accept</button>
+    </div>
+  </div>
+</div>
+
+<div id="tc"></div>
+
+<script>
+/* ── Canvas background ─────────────────────────────────────── */
+const cv=document.getElementById('bgc'),cx=cv.getContext('2d');
+function rz(){cv.width=innerWidth;cv.height=innerHeight}rz();addEventListener('resize',rz);
+const PTS=Array.from({length:65},()=>({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.00024,vy:(Math.random()-.5)*.00024,r:Math.random()*1.3+.3,a:Math.random()*.38+.05,h:255+Math.random()*42}));
+(function drawBg(){
+  const W=cv.width,H=cv.height,t=Date.now()*.001;
+  cx.clearRect(0,0,W,H);
+  const g=cx.createRadialGradient(W*.32,H*.22,0,W*.5,H*.5,W*.85);
+  g.addColorStop(0,'rgba(65,15,145,.17)');g.addColorStop(1,'rgba(4,4,15,0)');
+  cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  PTS.forEach(p=>{
+    p.x+=p.vx+Math.sin(t*.22+p.y*7)*.00006;p.y+=p.vy+Math.cos(t*.17+p.x*7)*.00006;
+    if(p.x<0)p.x=1;if(p.x>1)p.x=0;if(p.y<0)p.y=1;if(p.y>1)p.y=0;
+    cx.beginPath();cx.arc(p.x*W,p.y*H,p.r,0,Math.PI*2);
+    cx.fillStyle=`hsla(${p.h},75%,65%,${p.a*(0.58+.42*Math.sin(t+p.x*17))})`;cx.fill();
+  });
+  for(let i=0;i<PTS.length;i++)for(let j=i+1;j<PTS.length;j++){
+    const dx=(PTS[i].x-PTS[j].x)*W,dy=(PTS[i].y-PTS[j].y)*H,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<100){cx.beginPath();cx.moveTo(PTS[i].x*W,PTS[i].y*H);cx.lineTo(PTS[j].x*W,PTS[j].y*H);cx.strokeStyle=`rgba(168,85,247,${.07*(1-d/100)})`;cx.lineWidth=.5;cx.stroke()}
+  }
+  requestAnimationFrame(drawBg);
+})();
+
+/* ── OTP input builder ─────────────────────────────────────── */
+function buildOTP(){
+  const row=document.getElementById('otp');row.innerHTML='';
+  for(let i=0;i<6;i++){
+    const inp=document.createElement('input');
+    inp.className='cb';inp.maxLength=1;inp.inputMode='text';inp.autocomplete='off';inp.autocorrect='off';inp.spellcheck=false;inp.dataset.i=i;
+    inp.addEventListener('input',e=>{
+      const v=e.target.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase();
+      e.target.value=v.slice(-1);
+      if(v&&i<5)row.children[i+1].focus();
+    });
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Backspace'&&!e.target.value&&i>0)row.children[i-1].focus();
+      if(e.key==='Enter')joinFromOTP();
+      if(e.key==='ArrowLeft'&&i>0)row.children[i-1].focus();
+      if(e.key==='ArrowRight'&&i<5)row.children[i+1].focus();
+    });
+    inp.addEventListener('paste',e=>{
+      e.preventDefault();
+      const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,6);
+      [...txt].forEach((c,k)=>{if(row.children[k])row.children[k].value=c});
+      row.children[Math.min(txt.length,5)].focus();
+    });
+    row.appendChild(inp);
+  }
+}
+buildOTP();
+function getOTP(){return [...document.getElementById('otp').children].map(i=>i.value).join('').toUpperCase()}
+function focusJoin(){document.getElementById('jcard').scrollIntoView({behavior:'smooth'});setTimeout(()=>document.getElementById('otp').children[0]?.focus(),300)}
+
+/* ── State ─────────────────────────────────────────────────── */
+const PFX='nxs-',CHUNK=65536;
+const NAMES=['Cosmic Fox','Nova Wolf','Stellar Cat','Pulsar Bear','Zenith Lynx','Orbit Hawk','Nebula Raven','Quasar Tiger'];
+const AVS=['💻','📱','🖥️','⌚','🎮','📡','🖨️','📟'];
+const myName=NAMES[Math.floor(Math.random()*NAMES.length)];
+const myAv=AVS[Math.floor(Math.random()*AVS.length)];
+let myPeer=null,myId=null,isHost=false,myCode=null;
+let hostConns={},hostConn=null,peerConns={},members={};
+let selPeer=null,pendIn=null,pendSends={},xfers={};
+let recvState={};// peerId -> recv state
+
+const PCFG={config:{iceServers:[
+  {urls:'stun:stun.l.google.com:19302'},
+  {urls:'stun:stun1.l.google.com:19302'},
+  {urls:'stun:stun2.l.google.com:19302'},
+  {urls:'stun:stun3.l.google.com:19302'},
+  {urls:'stun:global.stun.twilio.com:3478'},
+]}};
+
+/* ── Boot ──────────────────────────────────────────────────── */
+async function boot(){
+  setStatus('Connecting…');
+  const p=new URLSearchParams(location.search);
+  const aj=p.get('join');
+  if(aj){
+    setStatus('Joining room '+aj.toUpperCase()+'…');
+    await initMember();
+    showLobby();
+    const row=document.getElementById('otp');
+    [...aj.toUpperCase().slice(0,6)].forEach((c,i)=>{if(row.children[i])row.children[i].value=c});
+    setTimeout(()=>joinFromOTP(),700);
+  } else {
+    await tryHost();
+    showLobby();
+  }
+}
+
+async function tryHost(tries=0){
+  if(tries>10) return initMember();
+  const code=gcode();
+  return new Promise((ok,fail)=>{
+    const peer=new Peer(PFX+code,PCFG);
+    let done=false;
+    peer.on('open',id=>{done=true;myPeer=peer;myId=id;myCode=code;isHost=true;setupHostPeer();ok()});
+    peer.on('error',e=>{
+      if(done)return;peer.destroy();
+      if(e.type==='unavailable-id')tryHost(tries+1).then(ok).catch(fail);
+      else initMember().then(ok).catch(fail);
+    });
+  });
+}
+
+async function initMember(){
+  return new Promise((ok,fail)=>{
+    const peer=new Peer(PCFG);
+    peer.on('open',id=>{myPeer=peer;myId=id;isHost=false;
+      peer.on('connection',c=>setupDirectConn(c));ok()});
+    peer.on('error',fail);
+  });
+}
+
+function setupHostPeer(){
+  myPeer.on('connection',c=>{
+    const pid=c.peer;
+    c.on('open',()=>{
+      hostConns[pid]=c;
+      // Send existing member list (include host)
+      const list=Object.entries(members).map(([id,m])=>({id,name:m.name,av:m.av}));
+      list.push({id:myId,name:myName,av:myAv,host:true});
+      c.send(JSON.stringify({t:'members',list}));
+      // Announce to existing
+      const ann={t:'join',id:pid,name:'…',av:'📱'};
+      Object.entries(hostConns).forEach(([k,v])=>{if(k!==pid)v.send(JSON.stringify(ann))});
+      members[pid]={name:'…',av:'📱'};
+      refreshList();
+    });
+    c.on('data',d=>{
+      if(typeof d==='string'){
+        try{const m=JSON.parse(d);handleHostData(m,pid,c)}catch(e){}
+      } else handleChunk(d,pid);
+    });
+    c.on('close',()=>{
+      delete hostConns[pid];delete members[pid];
+      if(selPeer===pid)clearSel();
+      Object.values(hostConns).forEach(v=>v.send(JSON.stringify({t:'leave',id:pid})));
+      refreshList();toast(shortN(pid)+' left');
+    });
+    c.on('error',e=>{ delete hostConns[pid]; });
+  });
+}
+
+function handleHostData(m,pid,c){
+  if(m.t==='hs'){
+    members[pid]={name:m.name,av:m.av||'📱'};
+    const upd={t:'upd',id:pid,name:m.name,av:m.av||'📱'};
+    Object.entries(hostConns).forEach(([k,v])=>{if(k!==pid)v.send(JSON.stringify(upd))});
+    refreshList();toast('📱 '+m.name+' joined!');
+  } else handleFileMsg(m,pid,c);
+}
+
+/* ── Join ──────────────────────────────────────────────────── */
+async function joinRoom(code){
+  code=code.toUpperCase().trim();
+  if(code.length!==6){toast('Need a 6-letter code','er');return}
+  showSc('si');setStatus('Joining '+code+'…');
+  if(myPeer){myPeer.destroy();myPeer=null}
+  myId=null;isHost=false;members={};hostConns={};peerConns={};selPeer=null;recvState={};
+  await initMember();
+  myCode=code;
+  const hid=PFX+code;
+  const c=myPeer.connect(hid,{reliable:true,serialization:'binary'});
+  hostConn=c;
+  c.on('open',()=>{
+    c.send(JSON.stringify({t:'hs',name:myName,av:myAv}));
+    enterRoom(code);toast('✅ Joined room '+code,'ok');
+  });
+  c.on('data',d=>{
+    if(typeof d==='string'){try{const m=JSON.parse(d);handleMemberData(m)}catch(e){}}
+    else handleChunk(d,hid);
+  });
+  c.on('close',()=>{toast('Host disconnected','er');leaveRoom()});
+  c.on('error',e=>{
+    if(e.type==='peer-unavailable')toast('Room "'+code+'" not found!','er');
+    else toast('Connection error','er');
+    showLobby();
+  });
+  setTimeout(()=>{
+    if(myCode===code&&!document.getElementById('sr').classList.contains('active')){
+      toast('Could not connect — check the code','er');showLobby();
+    }
+  },14000);
+}
+
+function handleMemberData(m){
+  if(m.t==='members'){
+    m.list.forEach(mb=>{
+      if(mb.id===myId)return;
+      members[mb.id]={name:mb.name,av:mb.av||'📱',host:!!mb.host};
+      if(!mb.host&&!peerConns[mb.id])connectDirect(mb.id);
+    });
+    refreshList();
+  } else if(m.t==='join'){
+    if(m.id===myId)return;
+    members[m.id]={name:m.name||'…',av:m.av||'📱'};
+    if(!peerConns[m.id])connectDirect(m.id);
+    refreshList();toast('📱 '+m.name+' joined');
+  } else if(m.t==='upd'){
+    if(members[m.id]){members[m.id].name=m.name;members[m.id].av=m.av||members[m.id].av;refreshList()}
+  } else if(m.t==='leave'){
+    delete members[m.id];delete peerConns[m.id];
+    if(selPeer===m.id)clearSel();refreshList();
+  } else handleFileMsg(m,PFX+myCode,hostConn);
+}
+
+function connectDirect(tid){
+  if(peerConns[tid]||tid===myId)return;
+  const c=myPeer.connect(tid,{reliable:true,serialization:'binary'});
+  c.on('open',()=>{
+    peerConns[tid]=c;
+    c.send(JSON.stringify({t:'hs',name:myName,av:myAv}));
+    setupDirectConn(c);refreshList();
+  });
+  c.on('error',()=>{});
+}
+
+function setupDirectConn(c){
+  const pid=c.peer;
+  c.on('open',()=>{if(!peerConns[pid]){peerConns[pid]=c}});
+  c.on('data',d=>{
+    if(typeof d==='string'){
+      try{const m=JSON.parse(d);
+        if(m.t==='hs'){
+          if(members[pid]){members[pid].name=m.name;members[pid].av=m.av||'📱'}
+          else{members[pid]={name:m.name,av:m.av||'📱'}}
+          refreshList();
+        } else handleFileMsg(m,pid,c);
+      }catch(e){}
+    } else handleChunk(d,pid);
+  });
+  c.on('close',()=>{delete peerConns[pid];if(selPeer===pid)clearSel()});
+  c.on('error',()=>{});
+}
+
+/* ── File transfer ─────────────────────────────────────────── */
+function handleFileMsg(m,pid,c){
+  if(m.t==='fstart'){
+    recvState[pid]={meta:m,chunks:[],got:0,t0:Date.now(),tid:m.tid,c};
+    pendIn={pid,meta:m,c};
+    const mb=members[pid]||{name:'Unknown'};
+    document.getElementById('mfrm').textContent='From: '+(mb.name||shortI(pid));
+    document.getElementById('mfl').textContent=m.name;
+    document.getElementById('msz').textContent=fmtSz(m.size);
+    document.getElementById('mico').textContent=ficon(m.name,m.mime);
+    document.getElementById('mw').classList.add('show');
+  } else if(m.t==='facc'){
+    const p=pendSends[m.tid];
+    if(p){sendChunks(p.c,p.f,m.tid);delete pendSends[m.tid]}
+  } else if(m.t==='fdec'){
+    setXfer(m.tid,'fl',0,0,'Declined');toast('File declined','er');
+  } else if(m.t==='fend'){
+    const s=recvState[pid];if(!s)return;
+    const blob=new Blob(s.chunks,{type:s.meta.mime||'application/octet-stream'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=s.meta.name;
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},5000);
+    setXfer(s.tid,'dn',100,0);toast('📥 Saved: '+s.meta.name,'ok');
+    delete recvState[pid];
+  }
+}
+
+function handleChunk(data,pid){
+  const s=recvState[pid];if(!s)return;
+  s.chunks.push(data);s.got+=data.byteLength;
+  const pct=Math.min(99,Math.round(s.got/s.meta.size*100));
+  const spd=s.got/((Date.now()-s.t0)/1000||.001);
+  setXfer(s.tid,'recv',pct,spd);
+}
+
+function accFile(){
+  document.getElementById('mw').classList.remove('show');
+  if(!pendIn)return;
+  const{pid,meta,c}=pendIn;
+  addXfer(meta.tid,{name:meta.name,size:meta.size,mime:meta.mime,dir:'inc',st:'recv'});
+  c.send(JSON.stringify({t:'facc',tid:meta.tid}));
+  pendIn=null;
+}
+function decFile(){
+  document.getElementById('mw').classList.remove('show');
+  if(!pendIn)return;
+  const{meta,c,pid}=pendIn;
+  c.send(JSON.stringify({t:'fdec',tid:meta.tid}));
+  delete recvState[pid];pendIn=null;
+}
+
+function getConn(pid){
+  if(isHost)return hostConns[pid];
+  if(peerConns[pid])return peerConns[pid];
+  if(hostConn&&pid===PFX+myCode)return hostConn;
+  return null;
+}
+
+function sendFile(f){
+  if(!selPeer){toast('Select a device first','er');return}
+  const c=getConn(selPeer);
+  if(!c||!c.open){toast('Not connected to this device','er');return}
+  const tid=rid();
+  c.send(JSON.stringify({t:'fstart',tid,name:f.name,size:f.size,mime:f.type||'application/octet-stream'}));
+  addXfer(tid,{name:f.name,size:f.size,mime:f.type,dir:'out',st:'wait'});
+  pendSends[tid]={c,f};
+}
+
+async function sendChunks(c,f,tid){
+  setXfer(tid,'send',0,0);
+  const tot=Math.ceil(f.size/CHUNK);let sent=0;const t0=Date.now();
+  for(let i=0;i<tot;i++){
+    if(c.dataChannel)while(c.dataChannel.bufferedAmount>1.5*1024*1024)await slp(20);
+    const buf=await f.slice(i*CHUNK,(i+1)*CHUNK).arrayBuffer();
+    c.send(buf);sent+=buf.byteLength;
+    const pct=Math.round(sent/f.size*100);
+    const spd=sent/((Date.now()-t0)/1000||.001);
+    setXfer(tid,'send',pct,spd);
+  }
+  c.send(JSON.stringify({t:'fend',tid}));
+  setXfer(tid,'dn',100,0);toast('✅ Sent: '+f.name,'ok');
+}
+
+/* ── Transfer UI ───────────────────────────────────────────── */
+function addXfer(id,info){
+  xfers[id]=info;
+  document.getElementById('twrap').style.display='block';
+  const el=document.createElement('div');
+  el.className='ti '+(info.dir==='inc'?'inc':'');
+  el.id='t'+id;
+  el.innerHTML=`<div class="tbg" id="tbg${id}" style="width:0%"></div><div class="tico">${ficon(info.name,info.mime)}</div><div class="tinf"><div class="tnm">${esc(info.name)}</div><div class="tmt"><span>${fmtSz(info.size)}</span><span id="tspd${id}"></span><span style="color:${info.dir==='inc'?'var(--ok)':'var(--p3)'}">${info.dir==='inc'?'↓ In':'↑ Out'}</span></div><div class="tbar"><div class="tfil" id="tf${id}" style="width:0%"></div></div></div><div class="tbdg" id="tb${id}">Waiting</div>`;
+  document.getElementById('tlist').prepend(el);
+}
+
+function setXfer(id,st,pct,spd,lbl){
+  const f=document.getElementById('tf'+id),b=document.getElementById('tb'+id),bg=document.getElementById('tbg'+id),sp=document.getElementById('tspd'+id);
+  if(!f)return;
+  f.style.width=pct+'%';if(bg)bg.style.width=pct+'%';
+  if(sp&&spd>0)sp.textContent=fmtSz(spd)+'/s';
+  const lbls={wait:'Waiting',send:pct+'%',recv:pct+'%',dn:'Done ✓',fl:lbl||'Failed'};
+  b.textContent=lbls[st]||st;
+  b.className='tbdg'+(st==='dn'?' dn':st==='fl'?' fl':'');
+  if(st==='dn'){f.classList.add('dn');const item=document.getElementById('t'+id);if(item)item.className='ti dn';}
+  if(st==='fl'){const item=document.getElementById('t'+id);if(item)item.className='ti fl';}
+}
+
+/* ── Device list ───────────────────────────────────────────── */
+function refreshList(){
+  const grid=document.getElementById('dgrid'),ndm=document.getElementById('nodmsg');
+  const cnt=Object.keys(members).length;
+  document.getElementById('dcount').textContent=cnt;
+  document.getElementById('ccount').textContent=cnt+' device'+(cnt===1?'':'s');
+  ndm.style.display=cnt?'none':'block';
+  // Remove stale
+  grid.querySelectorAll('.dcard').forEach(c=>{if(!members[c.dataset.pid])c.remove()});
+  // Add/update
+  Object.entries(members).forEach(([pid,m])=>{
+    const ex=document.getElementById('dc'+pid.replace(/[^a-z0-9]/gi,'_'));
+    if(ex){ex.querySelector('.dn').textContent=m.name||'Unknown'}
+    else{
+      const d=document.createElement('div');
+      d.className='dcard'+(selPeer===pid?' sel':'');
+      d.id='dc'+pid.replace(/[^a-z0-9]/gi,'_');
+      d.dataset.pid=pid;
+      d.innerHTML=`<span class="dav">${m.av||'📱'}</span><div class="dn">${esc(m.name||'Unknown')}</div><div class="dt">${m.host?'Room Host':'Member'}</div><div class="dc">● Online</div>`;
+      d.onclick=()=>selDev(pid,m.name||'Unknown',m.av||'📱');
+      grid.appendChild(d);
+    }
+  });
+  updateDZ();
+}
+
+function selDev(pid,name,av){
+  selPeer=pid;
+  document.querySelectorAll('.dcard').forEach(c=>c.classList.toggle('sel',c.dataset.pid===pid));
+  document.getElementById('sbar').style.display='flex';
+  document.getElementById('snm').textContent=name;
+  document.getElementById('sav').textContent=av;
+  updateDZ();
+}
+
+function clearSel(){
+  selPeer=null;
+  document.querySelectorAll('.dcard').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('sbar').style.display='none';
+  updateDZ();
+}
+
+function updateDZ(){
+  const dz=document.getElementById('dzone'),t=document.getElementById('dtit'),s=document.getElementById('dsub'),b=document.getElementById('dzb');
+  const cnt=Object.keys(members).length;
+  if(cnt===0){dz.className='dz dis';t.textContent='Waiting for devices…';s.textContent='Share your code so others can join';b.style.display='none'}
+  else if(!selPeer){dz.className='dz';t.textContent='Tap a device to select';s.textContent='Then drop files here or click Choose';b.style.display='none'}
+  else{dz.className='dz rdy adz';const m=members[selPeer];t.textContent='Send to '+(m?m.name:'device');s.textContent='Drop files here, or click Choose Files';b.style.display='block'}
+}
+
+/* ── Drag & drop ───────────────────────────────────────────── */
+const dzone=document.getElementById('dzone');
+dzone.addEventListener('dragover',e=>{e.preventDefault();if(selPeer)dzone.classList.add('adz')});
+dzone.addEventListener('dragleave',()=>{if(!selPeer||!dzone.classList.contains('rdy'))dzone.classList.remove('adz')});
+dzone.addEventListener('drop',e=>{
+  e.preventDefault();
+  if(!selPeer){toast('Select a device first','er');return}
+  Array.from(e.dataTransfer.files).forEach(f=>sendFile(f));
+});
+function pickFiles(){document.getElementById('finput').click()}
+function onPick(files){Array.from(files).forEach(f=>sendFile(f));document.getElementById('finput').value=''}
+
+/* ── Screen helpers ────────────────────────────────────────── */
+function showSc(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function setStatus(t){document.getElementById('ist').textContent=t}
+
+function showLobby(){
+  document.getElementById('mycode').textContent=myCode||'------';
+  document.getElementById('msgcode').textContent=myCode||'------';
+  genQR();showSc('sl');
+}
+
+function enterRoom(code){
+  document.getElementById('hcode').textContent=code;
+  if(!isHost){
+    const hid=PFX+code;
+    if(!members[hid])members[hid]={name:'Room Host',av:'💻',host:true};
+  }
+  refreshList();showSc('sr');
+}
+
+function joinFromOTP(){
+  const code=getOTP();
+  if(code.length!==6){toast('Enter a full 6-letter code','er');return}
+  joinRoom(code);
+}
+
+async function leaveRoom(){
+  if(myPeer){myPeer.destroy();myPeer=null}
+  Object.assign({members:{},hostConns:{},peerConns:{},selPeer:null,pendIn:null,pendSends:{},xfers:{},recvState:{}},{});
+  members={};hostConns={};peerConns={};selPeer=null;pendIn=null;pendSends={};xfers={};recvState={};
+  document.getElementById('tlist').innerHTML='';document.getElementById('twrap').style.display='none';
+  document.getElementById('mw').classList.remove('show');
+  buildOTP();await boot();
+}
+
+/* ── QR ────────────────────────────────────────────────────── */
+function genQR(){
+  const w=document.getElementById('qwrap');w.innerHTML='';
+  if(!myCode)return;
+  const url=`${location.origin}${location.pathname}?join=${myCode}`;
+  new QRCode(w,{text:url,width:118,height:118,colorDark:'#1a0040',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+}
+
+function copyCode(){
+  if(!myCode)return;
+  navigator.clipboard.writeText(myCode).then(()=>toast('📋 Copied: '+myCode,'ok'));
+}
+
+function shareLink(){
+  const url=`${location.origin}${location.pathname}?join=${myCode}`;
+  if(navigator.share)navigator.share({title:'Join my NexShare room',url});
+  else navigator.clipboard.writeText(url).then(()=>toast('🔗 Link copied!','ok'));
+}
+
+/* ── Utils ─────────────────────────────────────────────────── */
+const CC='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function gcode(){let c='';for(let i=0;i<6;i++)c+=CC[Math.floor(Math.random()*CC.length)];return c}
+function rid(){return Math.random().toString(36).slice(2,10)}
+function shortI(id){return id?id.slice(0,7)+'…':'?'}
+function shortN(pid){return(members[pid]&&members[pid].name)||shortI(pid)}
+function slp(ms){return new Promise(r=>setTimeout(r,ms))}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function fmtSz(b){if(b<1024)return b+'B';if(b<1<<20)return(b/1024).toFixed(1)+'KB';if(b<1<<30)return(b/(1<<20)).toFixed(1)+'MB';return(b/(1<<30)).toFixed(2)+'GB'}
+const FI={img:'🖼️',vid:'🎬',aud:'🎵',pdf:'📄',zip:'📦',doc:'📝',xls:'📊',cod:'💾'};
+function ficon(name,mime){
+  mime=mime||'';
+  if(mime.startsWith('image/'))return FI.img;if(mime.startsWith('video/'))return FI.vid;if(mime.startsWith('audio/'))return FI.aud;
+  if(mime==='application/pdf')return FI.pdf;
+  const e=(name.split('.').pop()||'').toLowerCase();
+  if(['zip','tar','gz','rar','7z'].includes(e))return FI.zip;if(['doc','docx','txt','rtf'].includes(e))return FI.doc;
+  if(['xls','xlsx','csv'].includes(e))return FI.xls;if(['js','ts','html','css','py','java','go','rs','json','c','cpp'].includes(e))return FI.cod;
+  return '📁';
+}
+function toast(msg,type=''){
+  const el=document.createElement('div');el.className='toast '+(type==='ok'?'ok':type==='er'?'er':'');el.textContent=msg;
+  document.getElementById('tc').appendChild(el);
+  setTimeout(()=>{el.style.transition='opacity .3s';el.style.opacity='0';setTimeout(()=>el.remove(),300)},3000);
+}
+
+boot().catch(e=>{console.error(e);setStatus('Setup failed. Reload to retry.')});
+</script>
+</body>
+</html>
