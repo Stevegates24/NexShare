@@ -574,9 +574,12 @@ async function initMember(){
 const LOBBY_ID='nxs-global-lobby-v1';
 const LOBBY_TTL=120000; // 2 min — rooms expire if not re-announced
 
+let lobbyPeer=null;
+
 function startDiscovery(){
-  // Try to become the lobby host
+  if(lobbyPeer)try{lobbyPeer.destroy()}catch(e){}
   const lp=new Peer(LOBBY_ID,PCFG);
+  lobbyPeer=lp;
   lp.on('open',()=>{
     // We are the lobby host
     lobbyHost=true;
@@ -598,14 +601,20 @@ function startDiscovery(){
 }
 
 function connectToLobby(){
-  if(!myPeer)return;
   try{
-    const c=myPeer.connect(LOBBY_ID,{reliable:true});
-    lobbyConn=c;
-    c.on('open',()=>{announceToLobby()});
-    c.on('data',d=>{try{const m=JSON.parse(d);if(m.t==='rooms'){nearbyRooms=m.rooms||{};renderNearby()}}catch(e){}});
-    c.on('close',()=>{lobbyConn=null});
-    c.on('error',()=>{lobbyConn=null});
+    // Use a separate dedicated peer so destroying myPeer (during joinRoom) doesn't break discovery
+    if(lobbyPeer&&!lobbyHost)try{lobbyPeer.destroy()}catch(e){}
+    const lc=new Peer(PCFG);
+    lobbyPeer=lc;
+    lc.on('open',()=>{
+      const c=lc.connect(LOBBY_ID,{reliable:true});
+      lobbyConn=c;
+      c.on('open',()=>announceToLobby());
+      c.on('data',d=>{try{const m=JSON.parse(d);if(m.t==='rooms'){nearbyRooms=m.rooms||{};renderNearby()}}catch(e){}});
+      c.on('close',()=>{lobbyConn=null});
+      c.on('error',()=>{lobbyConn=null});
+    });
+    lc.on('error',()=>{});
   }catch(e){}
 }
 
@@ -979,8 +988,8 @@ function enterRoom(code){
   document.getElementById('tlist').innerHTML='';document.getElementById('twrap').style.display='none';
   document.getElementById('net-indicator').innerHTML='';
   refreshList();showSc('sr');
-  // Update lobby announcement with new room code
-  myCode=code;announceToLobby();
+  // Only the host announces to lobby. Members never overwrite myCode.
+  if(isHost) announceToLobby();
 }
 
 function joinFromOTP(){
@@ -997,9 +1006,11 @@ function leaveRoom(){
   document.getElementById('dgrid').appendChild(document.getElementById('nodmsg'));
   document.getElementById('nodmsg').style.display='block';
   buildOTP();
-  // Rebuild peer & re-enter lobby
+  // Show init immediately so there's feedback
+  showSc('si');setStatus('Returning to lobby…');
+  myCode=null;
+  // Build fresh host peer, THEN show lobby (avoids race condition)
   tryHost().then(()=>showLobby()).catch(()=>initMember().then(()=>showLobby()));
-  showLobby(); // show immediately, init runs in bg
 }
 
 /* ── QR generation ── */
