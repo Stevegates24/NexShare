@@ -2,11 +2,12 @@
   "name": "NexShare",
   "short_name": "NexShare",
   "description": "Instant peer-to-peer file transfer — no accounts, no servers, no installs.",
-  "start_url": "./nexshare.html",
+  "start_url": "./",
+  "id": "/",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#04040F",
+  "background_color": "#05050F",
   "theme_color": "#9333EA",
   "categories": ["utilities", "productivity"],
   "icons": [
@@ -14,21 +15,13 @@
       "src": "nexshare-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "nexshare-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ],
   "shortcuts": [
     {
-      "name": "Create Room",
-      "short_name": "New Room",
-      "description": "Open NexShare and create a new room",
-      "url": "./nexshare.html"
+      "name": "Open NexShare",
+      "url": "./"
     }
   ],
   "prefer_related_applications": false
