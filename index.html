@@ -3,13 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTAwNTAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwNjAwMTQiLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0ibmQiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjQzA4NEZDIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjN0MzQUVEIi8+PC9saW5lYXJHcmFkaWVudD48ZmlsdGVyIGlkPSJnbG93Ij48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxLjIiIHJlc3VsdD0iYmx1ciIvPjxmZU1lcmdlPjxmZU1lcmdlTm9kZSBpbj0iYmx1ciIvPjxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPjwvZmVNZXJnZT48L2ZpbHRlcj48L2RlZnM+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0idXJsKCNiZykiLz48ZyBvcGFjaXR5PSIwLjciPjxsaW5lIHgxPSIxNiIgeTE9IjgiIHgyPSI4IiB5Mj0iMjIiIHN0cm9rZT0iIzhCNUNGNiIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48bGluZSB4MT0iMTYiIHkxPSI4IiB4Mj0iMjQiIHkyPSIyMiIgc3Ryb2tlPSIjOEI1Q0Y2IiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxsaW5lIHgxPSI4IiB5MT0iMjIiIHgyPSIyNCIgeTI9IjIyIiBzdHJva2U9IiM4QjVDRjYiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9nPjxnIGZpbHRlcj0idXJsKCNnbG93KSI+PGNpcmNsZSBjeD0iMTYiIGN5PSI4IiByPSIzLjQiIGZpbGw9InVybCgjbmQpIi8+PGNpcmNsZSBjeD0iOCIgY3k9IjIyIiByPSIzLjQiIGZpbGw9InVybCgjbmQpIi8+PGNpcmNsZSBjeD0iMjQiIGN5PSIyMiIgcj0iMy40IiBmaWxsPSJ1cmwoI25kKSIvPjwvZz48L3N2Zz4=">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#9333EA">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NexShare">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>NEXSHARE · File Transfer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{
   --bg:#04040F;--sf:rgba(110,50,210,.08);--sf2:rgba(110,50,210,.15);
@@ -27,7 +34,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 .screen{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;align-items:center;overflow-y:auto}
 .screen.active{display:flex}
 
-/* ── Init ── */
+/* Init */
 #si{justify-content:center;align-items:center;gap:1.2rem;background:var(--bg)}
 .il{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;letter-spacing:.18em;background:linear-gradient(135deg,#C084FC,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
@@ -35,19 +42,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 @keyframes spin{to{transform:rotate(360deg)}}
 .it{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--fgm)}
 
-/* ── Lobby ── */
+/* Lobby */
 #sl{padding:1.75rem 1.1rem 3rem;justify-content:flex-start;align-items:center}
 .lw{width:100%;max-width:460px;display:flex;flex-direction:column;gap:.9rem}
 .lhdr{display:flex;align-items:center;justify-content:space-between;padding:0 .1rem;margin-bottom:.15rem}
 .logo{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;letter-spacing:.14em;background:linear-gradient(135deg,#C084FC,#9333EA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .tag{font-size:.74rem;color:var(--fgm);letter-spacing:.04em}
 
+/* PWA install banner */
+#pwa-banner{display:none;align-items:center;gap:.75rem;padding:.75rem 1rem;background:linear-gradient(135deg,rgba(147,51,234,.15),rgba(109,40,217,.1));border:1px solid var(--bdh);border-radius:var(--r);animation:fadeUp .35s ease}
+#pwa-banner.show{display:flex}
+.pwa-ico{font-size:1.5rem;flex-shrink:0}
+.pwa-txt{flex:1;font-size:.78rem;color:var(--fgm);line-height:1.4}
+.pwa-txt strong{color:var(--fg);display:block;margin-bottom:.1rem}
+
 /* Card */
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:1.35rem 1.4rem;position:relative;overflow:hidden;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:border-color .3s,box-shadow .3s}
 .card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,.35),transparent)}
 .clbl{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--fgd);font-weight:700;margin-bottom:.85rem;display:flex;align-items:center;gap:.45rem}
 
-/* Device / name */
+/* Device/name */
 .dev-card-inner{display:flex;align-items:center;gap:1rem}
 .dev-avatar-btn{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--p1),#5b21b6);border:2px solid var(--bdh);display:flex;align-items:center;justify-content:center;font-size:1.6rem;cursor:pointer;flex-shrink:0;transition:all .2s;position:relative;box-shadow:0 0 18px rgba(147,51,234,.35)}
 .dev-avatar-btn:hover{transform:scale(1.06);box-shadow:var(--gs)}
@@ -100,19 +114,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 .bgh{background:transparent;border-color:var(--fgd);color:var(--fgm)}
 .bgh:hover{border-color:var(--bd);color:var(--fg);background:var(--sf)}
 .bwarn{border-color:rgba(251,191,36,.3);color:var(--warn)}
-.bwarn:hover{border-color:var(--warn);background:rgba(251,191,36,.08);box-shadow:0 0 12px rgba(251,191,36,.2)}
+.bwarn:hover{border-color:var(--warn);background:rgba(251,191,36,.08)}
 
-/* ── Auto-discovery nearby rooms ── */
+/* Nearby */
 .nearby-wrap{display:flex;flex-direction:column;gap:.5rem}
 .nearby-empty{text-align:center;padding:1.1rem;color:var(--fgd);font-size:.78rem;border:1px dashed var(--bd);border-radius:var(--r2)}
-.nearby-room{
-  display:flex;align-items:center;gap:.8rem;
-  padding:.75rem 1rem;
-  background:var(--sf);border:1px solid var(--bd);
-  border-radius:var(--r);cursor:pointer;
-  transition:all .22s;animation:fadeUp .3s ease;
-  position:relative;overflow:hidden;
-}
+.nearby-room{display:flex;align-items:center;gap:.8rem;padding:.75rem 1rem;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;transition:all .22s;animation:fadeUp .3s ease;position:relative;overflow:hidden}
 .nearby-room::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,.25),transparent)}
 .nearby-room:hover{border-color:var(--bdh);box-shadow:var(--gs);transform:translateY(-1px)}
 .nr-av{font-size:1.4rem;flex-shrink:0}
@@ -121,11 +128,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 .nr-meta{font-size:.68rem;color:var(--fgm);margin-top:.1rem}
 .nr-code{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;color:var(--p3);letter-spacing:.08em}
 .nr-join{font-size:.72rem;font-weight:600;color:var(--p3);padding:.25rem .6rem;border:1px solid var(--bdh);border-radius:100px;background:rgba(168,85,247,.1);white-space:nowrap;flex-shrink:0}
-.nearby-scanning{display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:var(--fgm);padding:.4rem 0}
+.nearby-scanning{display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:var(--fgm)}
 .nearby-scanning .scan-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:blink 1.2s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 
-/* ── QR Scanner modal ── */
+/* QR Scanner */
 #qr-scan-modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
 #qr-scan-modal.show{display:flex}
 .qsm-back{position:absolute;inset:0;background:rgba(4,4,15,.92);backdrop-filter:blur(10px)}
@@ -139,8 +146,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 #qr-canvas{display:none}
 .qr-scan-line{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--p2),transparent);animation:scanLine 2s ease-in-out infinite}
 @keyframes scanLine{0%{top:0;opacity:1}45%{top:calc(100% - 2px);opacity:1}50%{opacity:0}55%{top:0;opacity:0}60%{opacity:1}100%{top:0;opacity:1}}
-.qr-corners{position:absolute;inset:0;pointer-events:none}
 .qr-corners::before,.qr-corners::after{content:'';position:absolute;width:24px;height:24px;border-color:var(--p2);border-style:solid;border-radius:3px}
+.qr-corners{position:absolute;inset:0;pointer-events:none}
 .qr-corners::before{top:10px;left:10px;border-width:2px 0 0 2px}
 .qr-corners::after{top:10px;right:10px;border-width:2px 2px 0 0}
 .qr-corner-bl{position:absolute;bottom:10px;left:10px;width:24px;height:24px;border:2px solid var(--p2);border-right:none;border-top:none;border-radius:3px}
@@ -148,7 +155,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 .qsm-status{font-size:.75rem;color:var(--fgm);margin-top:.75rem;min-height:1.2em}
 .qsm-found{color:var(--ok);font-weight:600;font-size:.85rem}
 
-/* ── Room Screen ── */
+/* Room screen */
 #sr{padding:0;justify-content:flex-start;align-items:stretch}
 .rhdr{display:flex;align-items:center;gap:.65rem;padding:.8rem 1rem;background:rgba(4,4,15,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--bd);flex-shrink:0;position:sticky;top:0;z-index:20}
 .rlogo{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;letter-spacing:.12em;background:linear-gradient(135deg,#C084FC,#9333EA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -161,9 +168,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 .slbl{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--fgd);font-weight:700;display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem}
 .slbl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bd),transparent)}
 .cbadge{background:rgba(168,85,247,.12);color:var(--p3);padding:.07rem .4rem;border-radius:100px;font-size:.68rem;font-weight:600}
-
-/* Network quality badge */
-.net-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.65rem;padding:.18rem .55rem;border-radius:100px;font-weight:600;margin-left:.4rem}
+.net-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.65rem;padding:.18rem .55rem;border-radius:100px;font-weight:600}
 .net-direct{background:rgba(52,211,153,.12);color:var(--ok);border:1px solid rgba(52,211,153,.25)}
 .net-relay{background:rgba(251,191,36,.1);color:var(--warn);border:1px solid rgba(251,191,36,.2)}
 
@@ -181,6 +186,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 .dt{font-size:.62rem;color:var(--fgm);margin-top:.15rem}
 .dc{font-size:.6rem;color:var(--ok);margin-top:.22rem}
 .you-tag{font-size:.6rem;color:var(--p3);margin-top:.22rem}
+/* Ping badge on device cards */
+.ping-badge{font-size:.58rem;border-radius:100px;padding:.1rem .38rem;font-weight:600;margin-top:.2rem;display:inline-block}
+.ping-ok{background:rgba(52,211,153,.12);color:var(--ok)}
+.ping-warn{background:rgba(251,191,36,.12);color:var(--warn)}
+.ping-bad{background:rgba(248,113,113,.12);color:var(--err)}
 .nodmsg{grid-column:1/-1;text-align:center;padding:1.6rem;color:var(--fgd);font-size:.8rem;border:1px dashed var(--bd);border-radius:var(--r2);line-height:1.8}
 .nodmsg strong{color:var(--fgm)}
 
@@ -195,7 +205,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 .sbar .sc{margin-left:auto}
 
 /* Drop zone */
-.dz{border:2px dashed var(--bd);border-radius:var(--r2);padding:2rem 1.25rem;text-align:center;transition:all .3s;position:relative;overflow:hidden;min-height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dz{border:2px dashed var(--bd);border-radius:var(--r2);padding:2rem 1.25rem;text-align:center;transition:all .3s;position:relative;overflow:hidden;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .dz.adz{border-color:var(--p2);background:rgba(168,85,247,.06);box-shadow:var(--gm)}
 .dz.rdy{cursor:pointer}
 .dz.dis{opacity:.38;cursor:not-allowed}
@@ -205,12 +215,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 .dsub{font-size:.76rem;color:var(--fgm);line-height:1.5}
 .dzb{margin-top:.9rem;display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
 
+/* Speed graph */
+.graph-wrap{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:.8rem .9rem}
+.graph-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.graph-title{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--fgd);font-weight:700}
+.graph-stat{font-size:.72rem;color:var(--fgm);display:flex;gap:1rem}
+.graph-stat span{display:flex;align-items:center;gap:.3rem}
+.graph-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+#speed-canvas{width:100%;height:52px;border-radius:6px;display:block}
+.graph-labels{display:flex;justify-content:space-between;font-size:.58rem;color:var(--fgd);margin-top:.25rem}
+
 /* Transfers */
+.t-hdr{display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem}
+.t-hdr .slbl{margin-bottom:0;flex:1}
 .tlist{display:flex;flex-direction:column;gap:.5rem}
 .ti{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:.82rem .95rem;display:flex;align-items:center;gap:.75rem;position:relative;overflow:hidden;animation:fadeUp .28s ease}
 .ti.inc{border-color:rgba(52,211,153,.18)}
 .ti.dn{border-color:rgba(52,211,153,.32)}
 .ti.fl{border-color:rgba(248,113,113,.28)}
+.ti.pau{border-color:rgba(251,191,36,.22);opacity:.85}
+.ti.que{opacity:.6}
 .tbg{position:absolute;left:0;top:0;bottom:0;background:rgba(168,85,247,.05);transition:width .15s;pointer-events:none}
 .tico{font-size:1.45rem;flex-shrink:0}
 .tinf{flex:1;min-width:0}
@@ -219,9 +243,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 .tbar{height:2px;background:rgba(255,255,255,.06);border-radius:100px;margin-top:.4rem;overflow:hidden}
 .tfil{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--p1),var(--p2));transition:width .15s;box-shadow:0 0 6px var(--p1)}
 .tfil.dn{background:var(--ok);box-shadow:0 0 6px var(--ok)}
-.tbdg{font-size:.64rem;font-weight:600;padding:.18rem .48rem;border-radius:100px;background:rgba(168,85,247,.11);color:var(--p3);min-width:3.4rem;text-align:center;flex-shrink:0}
+.tfil.pau{background:var(--warn)}
+.t-right{display:flex;flex-direction:column;align-items:flex-end;gap:.3rem;flex-shrink:0}
+.tbdg{font-size:.64rem;font-weight:600;padding:.18rem .48rem;border-radius:100px;background:rgba(168,85,247,.11);color:var(--p3);min-width:3.4rem;text-align:center}
 .tbdg.dn{background:rgba(52,211,153,.11);color:var(--ok)}
 .tbdg.fl{background:rgba(248,113,113,.11);color:var(--err)}
+.tbdg.pau{background:rgba(251,191,36,.11);color:var(--warn)}
+.tbdg.que{background:rgba(255,255,255,.06);color:var(--fgm)}
+.t-pause-btn{font-size:.6rem;cursor:pointer;padding:.15rem .4rem;border-radius:100px;border:1px solid var(--bd);background:transparent;color:var(--fgm);transition:all .18s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.t-pause-btn:hover{border-color:var(--bdh);color:var(--fg)}
 
 /* Incoming modal */
 #mw{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
@@ -261,9 +291,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 <!-- LOBBY -->
 <div id="sl" class="screen">
   <div class="lw">
-    <div class="lhdr">
-      <span class="logo">NEXSHARE</span>
-      <span class="tag">Instant · Private · Anywhere</span>
+    <div class="lhdr"><span class="logo">NEXSHARE</span><span class="tag">Instant · Private · Anywhere</span></div>
+
+    <!-- PWA install banner (shown when installable) -->
+    <div id="pwa-banner">
+      <span class="pwa-ico">📲</span>
+      <div class="pwa-txt"><strong>Install NexShare</strong>Add to home screen for instant access</div>
+      <button class="btn bsm bp" id="pwa-install-btn">Install</button>
+      <button class="btn bsm bgh" onclick="document.getElementById('pwa-banner').classList.remove('show')">✕</button>
     </div>
 
     <!-- Your Device -->
@@ -276,10 +311,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
         </div>
         <div class="dev-right">
           <input class="dev-name-input" id="name-input" maxlength="24" placeholder="Your name…" autocomplete="off" spellcheck="false">
-          <div class="dev-sub">
-            <span class="dot"></span>
-            <span id="dev-status-txt">Ready</span>
-          </div>
+          <div class="dev-sub"><span class="dot"></span><span id="dev-status-txt">Ready</span></div>
         </div>
       </div>
       <div id="av-picker"></div>
@@ -302,7 +334,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
       <div class="qrow">
         <div id="qwrap"></div>
         <div class="qinfo">
-          <p>Scan to auto-join, or enter a code below. Works across the internet too.</p>
+          <p>Scan to auto-join, or enter a code below. Works across internet too.</p>
           <div class="qinfo-btns">
             <button class="btn bsm bp" onclick="openQRScanner()">📷 Scan QR Code</button>
             <button class="btn bsm bgh" onclick="focusJoin()">⌨️ Type a code →</button>
@@ -311,21 +343,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
       </div>
     </div>
 
-    <!-- Auto-discovered rooms -->
+    <!-- Nearby -->
     <div class="card" id="nearby-card">
-      <div class="clbl">
-        🔍 Nearby / Online Rooms
-        <span class="nearby-scanning"><span class="scan-dot"></span> scanning</span>
-      </div>
+      <div class="clbl">🔍 Nearby / Online Rooms <span class="nearby-scanning"><span class="scan-dot"></span></span></div>
       <div class="nearby-wrap" id="nearby-list">
         <div class="nearby-empty" id="nearby-empty">Looking for active rooms…</div>
       </div>
     </div>
 
-    <!-- Divider -->
-    <div class="div">— or join with a code —</div>
+    <div class="div">— join with a code —</div>
 
-    <!-- Join -->
     <div class="card" id="jcard">
       <div class="clbl">🔑 Enter Room Code</div>
       <div class="otp" id="otp"></div>
@@ -341,6 +368,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
     <div class="rbadge">Room&nbsp;<span class="rcode" id="hcode">——</span></div>
     <div class="hright">
       <div class="opill"><div class="don"></div><span id="ccount">1</span></div>
+      <button class="btn bsm bgh" onclick="openQRScanner()" id="room-scan-btn" style="display:none">📷</button>
       <button class="btn bsm bgh" onclick="leaveRoom()">↩ Leave</button>
     </div>
   </div>
@@ -348,19 +376,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
     <div class="room-info-bar">
       <span style="font-size:.7rem;color:var(--fgd)">Room</span>
       <span class="ri-code" id="ri-code">——</span>
-      <span style="font-size:.7rem;color:var(--fgd);opacity:.5">|</span>
+      <span style="font-size:.7rem;color:var(--fgd);opacity:.4">|</span>
       <span id="net-indicator"></span>
       <div class="ri-actions">
         <button class="btn bsm" onclick="copyCode()">⎘ Copy</button>
         <button class="btn bsm" onclick="shareLink()">🔗 Share</button>
-        <button class="btn bsm bgh" onclick="openQRScanner()" id="room-scan-btn" style="display:none">📷 Scan</button>
       </div>
     </div>
 
     <div>
       <div class="slbl">Devices <span class="cbadge" id="dcount">1</span></div>
       <div class="dgrid" id="dgrid">
-        <div class="nodmsg" id="nodmsg">Waiting for others…<br><strong>Share your code: <span id="msgcode">——</span></strong></div>
+        <div class="nodmsg" id="nodmsg">Waiting for others…<br><strong>Share code: <span id="msgcode">——</span></strong></div>
       </div>
     </div>
 
@@ -382,8 +409,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
     <input type="file" id="finput" multiple style="display:none" onchange="onPick(this.files)">
     <input type="file" id="finput-dir" multiple webkitdirectory style="display:none" onchange="onPick(this.files)">
 
-    <div id="twrap" style="display:none;padding-bottom:1rem">
-      <div class="slbl">Transfers</div>
+    <!-- Speed & latency graph -->
+    <div class="graph-wrap" id="graph-wrap" style="display:none">
+      <div class="graph-hdr">
+        <span class="graph-title">Transfer Speed</span>
+        <div class="graph-stat">
+          <span><span class="graph-dot" style="background:var(--p2)"></span><span id="g-cur">0 B/s</span></span>
+          <span><span class="graph-dot" style="background:var(--ok)"></span><span id="g-peak">Peak: 0 B/s</span></span>
+        </div>
+      </div>
+      <canvas id="speed-canvas"></canvas>
+      <div class="graph-labels"><span>60s ago</span><span>Now</span></div>
+    </div>
+
+    <!-- Transfers -->
+    <div id="twrap" style="display:none;padding-bottom:1.5rem">
+      <div class="t-hdr">
+        <div class="slbl" style="flex:1;margin-bottom:0">Transfers <span class="cbadge" id="t-count">0</span></div>
+        <button class="btn bsm bgh" onclick="clearDoneXfers()" id="t-clear-btn" style="display:none">Clear done</button>
+      </div>
       <div class="tlist" id="tlist"></div>
     </div>
   </div>
@@ -393,10 +437,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
 <div id="qr-scan-modal">
   <div class="qsm-back" onclick="closeQRScanner()"></div>
   <div class="qsm-box">
-    <div class="qsm-title">
-      <span>📷 Scan Room QR</span>
-      <span class="qsm-close" onclick="closeQRScanner()">✕</span>
-    </div>
+    <div class="qsm-title"><span>📷 Scan Room QR</span><span class="qsm-close" onclick="closeQRScanner()">✕</span></div>
     <div id="qr-video-wrap">
       <video id="qr-video" autoplay playsinline muted></video>
       <canvas id="qr-canvas"></canvas>
@@ -409,7 +450,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-h
   </div>
 </div>
 
-<!-- Incoming file modal -->
+<!-- Incoming modal -->
 <div id="mw">
   <div class="mback" onclick="decFile()"></div>
   <div class="mbox">
@@ -450,6 +491,23 @@ const PTS=Array.from({length:60},()=>({x:Math.random(),y:Math.random(),vx:(Math.
   requestAnimationFrame(drawBg);
 })();
 
+/* ── PWA ── */
+let pwaPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();pwaPrompt=e;
+  document.getElementById('pwa-banner').classList.add('show');
+});
+document.getElementById('pwa-install-btn').onclick=async()=>{
+  if(!pwaPrompt)return;
+  pwaPrompt.prompt();
+  const{outcome}=await pwaPrompt.userChoice;
+  if(outcome==='accepted')document.getElementById('pwa-banner').classList.remove('show');
+  pwaPrompt=null;
+};
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
 /* ── Identity ── */
 const STORAGE_KEY='nxs-identity';
 const FALLBACK_NAMES=['Cosmic Fox','Nova Wolf','Stellar Cat','Pulsar Bear','Zenith Lynx','Orbit Hawk','Nebula Raven','Quasar Tiger','Solar Panda','Lunar Crane'];
@@ -460,8 +518,6 @@ const identity=loadId();
 let myName=identity.name,myAv=identity.av;
 document.getElementById('name-input').value=myName;
 document.getElementById('av-display').textContent=myAv;
-
-// Build avatar picker
 const avPicker=document.getElementById('av-picker');
 ALL_AVS.forEach(av=>{
   const btn=document.createElement('button');btn.className='av-opt'+(av===myAv?' active':'');btn.textContent=av;
@@ -473,9 +529,8 @@ document.getElementById('name-input').addEventListener('input',e=>{myName=e.targ
 function broadcastId(){
   const msg=JSON.stringify({t:'hs',name:myName,av:myAv});
   Object.values(hostConns).forEach(c=>{try{c.send(msg)}catch(e){}});
-  if(hostConn&&hostConn.open)try{hostConn.send(msg)}catch(e){};
+  if(hostConn?.open)try{hostConn.send(msg)}catch(e){};
   Object.values(peerConns).forEach(c=>{try{c.send(msg)}catch(e){}});
-  // Re-announce to discovery
   announceToLobby();
 }
 
@@ -483,10 +538,21 @@ function broadcastId(){
 function buildOTP(){
   const row=document.getElementById('otp');row.innerHTML='';
   for(let i=0;i<6;i++){
-    const inp=document.createElement('input');inp.className='cb';inp.maxLength=1;inp.inputMode='text';inp.autocomplete='off';inp.autocorrect='off';inp.spellcheck=false;
+    const inp=document.createElement('input');
+    inp.className='cb';inp.maxLength=1;inp.inputMode='text';inp.autocomplete='off';inp.autocorrect='off';inp.spellcheck=false;
     inp.addEventListener('input',e=>{const v=e.target.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase();e.target.value=v.slice(-1);if(v&&i<5)row.children[i+1].focus()});
-    inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!e.target.value&&i>0)row.children[i-1].focus();if(e.key==='Enter')joinFromOTP();if(e.key==='ArrowLeft'&&i>0)row.children[i-1].focus();if(e.key==='ArrowRight'&&i<5)row.children[i+1].focus()});
-    inp.addEventListener('paste',e=>{e.preventDefault();const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,6);[...txt].forEach((c,k)=>{if(row.children[k])row.children[k].value=c});row.children[Math.min(txt.length,5)].focus()});
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Backspace'&&!e.target.value&&i>0)row.children[i-1].focus();
+      if(e.key==='Enter')joinFromOTP();
+      if(e.key==='ArrowLeft'&&i>0)row.children[i-1].focus();
+      if(e.key==='ArrowRight'&&i<5)row.children[i+1].focus();
+    });
+    inp.addEventListener('paste',e=>{
+      e.preventDefault();
+      const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,6);
+      [...txt].forEach((c,k)=>{if(row.children[k])row.children[k].value=c});
+      row.children[Math.min(txt.length,5)].focus();
+    });
     row.appendChild(inp);
   }
 }
@@ -494,39 +560,44 @@ buildOTP();
 function getOTP(){return[...document.getElementById('otp').children].map(i=>i.value).join('').toUpperCase()}
 function focusJoin(){document.getElementById('jcard').scrollIntoView({behavior:'smooth'});setTimeout(()=>document.getElementById('otp').children[0]?.focus(),300)}
 
-/* ── ICE Config — STUN + TURN (works everywhere) ── */
+/* ── Core state ── */
 const PFX='nxs-',CHUNK=262144;
-const ICE_SERVERS=[
-  // ── STUN (fast, direct, for same-network / simple NAT) ──
+const PCFG={config:{iceServers:[
   {urls:'stun:stun.l.google.com:19302'},
   {urls:'stun:stun1.l.google.com:19302'},
-  {urls:'stun:stun2.l.google.com:19302'},
   {urls:'stun:stun.cloudflare.com:3478'},
-  // ── TURN via OpenRelay (free, open-source, no account needed) ──
-  // UDP 80 — fastest relay, works on most networks
   {urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},
-  // UDP 443 — passes through many VPNs and firewalls
   {urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
-  // TCP 443 — passes through strict firewalls that block UDP completely
   {urls:'turn:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'},
-  // ── TURN via Metered (free tier, global edge nodes) ──
-  {urls:'turn:relay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},
-  {urls:'turn:relay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
   {urls:'turn:relay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'},
-  // ── Twilio STUN (reliable fallback) ──
   {urls:'stun:global.stun.twilio.com:3478'},
-];
-const PCFG={config:{iceServers:ICE_SERVERS,iceCandidatePoolSize:10}};
+],iceCandidatePoolSize:10}};
 
-/* ── State ── */
-let myPeer=null,myId=null,isHost=false,myCode=null;
+let myPeer=null, myId=null, isHost=false;
+// ── KEY FIX: two separate variables ──
+// myCode   = YOUR OWN host room code (never changes while you're host)
+// roomCode = the room you're currently in (same as myCode if host, host's code if member)
+let myCode=null, roomCode=null;
+
 let hostConns={},hostConn=null,peerConns={},members={};
-let selPeer=null,pendIn=null,pendSends={},xfers={},recvState={};
+let selPeer=null,pendIn=null,recvState={},connTypes={};
+// Queue system
+let xferQueues={};   // peerId -> [{f,tid,resolve?}]
+let xferActive={};   // peerId -> bool
+let pendSends={};    // tid -> {c,f,peerId,onDone}
+let pausedXfers=new Set();
+let xfers={};
 // Discovery
-let lobbyConn=null,lobbyHost=false,lobbyClients={};
-let nearbyRooms={}; // code -> {name,av,ts}
-// Network quality tracking per peer
-let connTypes={}; // peerId -> 'direct'|'relay'
+let lobbyPeer=null,lobbyHost=false,lobbyClients={},lobbyConn=null,nearbyRooms={};
+// Race condition prevention
+let bootGen=0;
+// Latency
+let latencies={};
+// Speed graph data
+let speedSamples=Array(60).fill(0);
+let peakSpeed=0;
+let lastSpeedBytes=0;
+let lastSpeedTime=Date.now();
 
 /* ── Boot ── */
 async function boot(){
@@ -544,9 +615,9 @@ async function boot(){
     await tryHost();
     showLobby();
   }
-  // Start discovery in parallel
   startDiscovery();
-  // Show scan button on mobile
+  startPingLoop();
+  startGraphLoop();
   if(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)){
     document.getElementById('room-scan-btn').style.display='';
   }
@@ -557,146 +628,24 @@ async function tryHost(tries=0){
   const code=gcode();
   return new Promise((ok,fail)=>{
     const peer=new Peer(PFX+code,PCFG);let done=false;
-    peer.on('open',id=>{done=true;myPeer=peer;myId=id;myCode=code;isHost=true;setupHostPeer();ok()});
-    peer.on('error',e=>{if(done)return;peer.destroy();if(e.type==='unavailable-id')tryHost(tries+1).then(ok).catch(fail);else initMember().then(ok).catch(fail)});
+    peer.on('open',id=>{done=true;myPeer=peer;myId=id;myCode=code;roomCode=code;isHost=true;setupHostPeer();ok()});
+    peer.on('error',e=>{if(done)return;peer.destroy();
+      if(e.type==='unavailable-id')tryHost(tries+1).then(ok).catch(fail);
+      else initMember().then(ok).catch(fail);
+    });
   });
 }
 
 async function initMember(){
   return new Promise((ok,fail)=>{
     const peer=new Peer(PCFG);
-    peer.on('open',id=>{myPeer=peer;myId=id;isHost=false;peer.on('connection',c=>setupDirectConn(c));ok()});
+    peer.on('open',id=>{myPeer=peer;myId=id;isHost=false;
+      peer.on('connection',c=>setupDirectConn(c));ok()});
     peer.on('error',fail);
   });
 }
 
-/* ── Auto-discovery via shared lobby peer ── */
-const LOBBY_ID='nxs-global-lobby-v1';
-const LOBBY_TTL=120000; // 2 min — rooms expire if not re-announced
-
-let lobbyPeer=null;
-
-function startDiscovery(){
-  if(lobbyPeer)try{lobbyPeer.destroy()}catch(e){}
-  const lp=new Peer(LOBBY_ID,PCFG);
-  lobbyPeer=lp;
-  lp.on('open',()=>{
-    // We are the lobby host
-    lobbyHost=true;
-    lp.on('connection',c=>{
-      c.on('open',()=>{lobbyClients[c.peer]=c;c.send(JSON.stringify({t:'rooms',rooms:nearbyRooms}))});
-      c.on('data',d=>{try{const m=JSON.parse(d);handleLobbyMsg(m,c)}catch(e){}});
-      c.on('close',()=>{delete lobbyClients[c.peer]});
-      c.on('error',()=>{delete lobbyClients[c.peer]});
-    });
-    // Announce self
-    if(myCode)announceToLobby();
-  });
-  lp.on('error',e=>{
-    if(e.type==='unavailable-id'){
-      // Someone else is lobby host — connect as client
-      connectToLobby();
-    }
-  });
-}
-
-function connectToLobby(){
-  try{
-    // Use a separate dedicated peer so destroying myPeer (during joinRoom) doesn't break discovery
-    if(lobbyPeer&&!lobbyHost)try{lobbyPeer.destroy()}catch(e){}
-    const lc=new Peer(PCFG);
-    lobbyPeer=lc;
-    lc.on('open',()=>{
-      const c=lc.connect(LOBBY_ID,{reliable:true});
-      lobbyConn=c;
-      c.on('open',()=>announceToLobby());
-      c.on('data',d=>{try{const m=JSON.parse(d);if(m.t==='rooms'){nearbyRooms=m.rooms||{};renderNearby()}}catch(e){}});
-      c.on('close',()=>{lobbyConn=null});
-      c.on('error',()=>{lobbyConn=null});
-    });
-    lc.on('error',()=>{});
-  }catch(e){}
-}
-
-function announceToLobby(){
-  if(!myCode)return;
-  const msg=JSON.stringify({t:'announce',code:myCode,name:myName,av:myAv,ts:Date.now()});
-  if(lobbyHost){
-    nearbyRooms[myCode]={name:myName,av:myAv,ts:Date.now()};
-    broadcastLobby({t:'rooms',rooms:nearbyRooms});
-    renderNearby();
-  } else if(lobbyConn&&lobbyConn.open){
-    try{lobbyConn.send(msg)}catch(e){}
-  }
-}
-
-function handleLobbyMsg(m,fromConn){
-  if(m.t==='announce'){
-    nearbyRooms[m.code]={name:m.name,av:m.av,ts:m.ts||Date.now()};
-    pruneOldRooms();
-    broadcastLobby({t:'rooms',rooms:nearbyRooms});
-    renderNearby();
-  }
-}
-
-function broadcastLobby(msg){
-  const s=JSON.stringify(msg);
-  Object.values(lobbyClients).forEach(c=>{try{c.send(s)}catch(e){}});
-}
-
-function pruneOldRooms(){
-  const now=Date.now();
-  Object.keys(nearbyRooms).forEach(k=>{if(now-nearbyRooms[k].ts>LOBBY_TTL)delete nearbyRooms[k]});
-}
-
-function renderNearby(){
-  const list=document.getElementById('nearby-list');
-  const empty=document.getElementById('nearby-empty');
-  // Filter out own room and stale rooms
-  pruneOldRooms();
-  const others=Object.entries(nearbyRooms).filter(([code])=>code!==myCode);
-  if(others.length===0){empty.style.display='block';list.querySelectorAll('.nearby-room').forEach(e=>e.remove());return}
-  empty.style.display='none';
-  // Remove stale cards
-  list.querySelectorAll('.nearby-room').forEach(el=>{if(!nearbyRooms[el.dataset.code])el.remove()});
-  // Add new
-  others.forEach(([code,r])=>{
-    if(document.querySelector(`.nearby-room[data-code="${code}"]`))return;
-    const el=document.createElement('div');
-    el.className='nearby-room';el.dataset.code=code;
-    el.innerHTML=`<span class="nr-av">${r.av||'💻'}</span><div class="nr-info"><div class="nr-name">${esc(r.name||'Unknown')}</div><div class="nr-meta">Room <span class="nr-code">${code}</span> · Active now</div></div><span class="nr-join">Join →</span>`;
-    el.onclick=()=>joinRoom(code);
-    list.insertBefore(el,list.firstChild);
-  });
-}
-
-// Re-announce every 60s to keep room alive in lobby
-setInterval(announceToLobby,60000);
-
-/* ── Network quality detection ── */
-async function detectConnType(conn){
-  if(!conn||!conn.peerConnection)return;
-  try{
-    const stats=await conn.peerConnection.getStats();
-    stats.forEach(report=>{
-      if(report.type==='candidate-pair'&&report.state==='succeeded'){
-        const local=stats.get(report.localCandidateId);
-        if(local){connTypes[conn.peer]=local.candidateType==='relay'?'relay':'direct';updateNetIndicator()}
-      }
-    });
-  }catch(e){}
-}
-
-function updateNetIndicator(){
-  const el=document.getElementById('net-indicator');if(!el)return;
-  const types=Object.values(connTypes);if(!types.length)return;
-  const hasRelay=types.includes('relay');
-  el.innerHTML=hasRelay
-    ?'<span class="net-badge net-relay">⚡ Relay</span>'
-    :'<span class="net-badge net-direct">⚡ Direct P2P</span>';
-}
-
-/* ── Host peer setup ── */
+/* ── Host ── */
 function setupHostPeer(){
   myPeer.on('connection',c=>{
     const pid=c.peer;
@@ -712,13 +661,20 @@ function setupHostPeer(){
       setTimeout(()=>detectConnType(c),3000);
     });
     c.on('data',d=>{if(typeof d==='string'){try{const m=JSON.parse(d);handleHostData(m,pid,c)}catch(e){}}else handleChunk(d,pid)});
-    c.on('close',()=>{const nm=shortN(pid);delete hostConns[pid];delete members[pid];delete connTypes[pid];if(selPeer===pid)clearSel();Object.values(hostConns).forEach(v=>v.send(JSON.stringify({t:'leave',id:pid})));refreshList();toast(nm+' left')});
+    c.on('close',()=>{
+      const nm=shortN(pid);delete hostConns[pid];delete members[pid];delete connTypes[pid];delete latencies[pid];
+      if(selPeer===pid)clearSel();
+      Object.values(hostConns).forEach(v=>v.send(JSON.stringify({t:'leave',id:pid})));
+      refreshList();toast(nm+' left');
+    });
     c.on('error',()=>{delete hostConns[pid]});
   });
 }
 
 function handleHostData(m,pid,c){
-  if(m.t==='hs'){
+  if(m.t==='ping'){c.send(JSON.stringify({t:'pong',ts:m.ts}))}
+  else if(m.t==='pong'){latencies[pid]=Date.now()-m.ts;updatePingBadge(pid)}
+  else if(m.t==='hs'){
     members[pid]={name:m.name,av:m.av||'📱'};
     const upd={t:'upd',id:pid,name:m.name,av:m.av||'📱'};
     Object.entries(hostConns).forEach(([k,v])=>{if(k!==pid)v.send(JSON.stringify(upd))});
@@ -727,42 +683,71 @@ function handleHostData(m,pid,c){
   } else handleFileMsg(m,pid,c);
 }
 
-/* ── Member logic ── */
+/* ── Member ── */
 async function joinRoom(code){
   code=code.toUpperCase().trim();
   if(code.length!==6){toast('Need a 6-letter code','er');return}
-  if(code===myCode){toast('That\'s your own room!','wn');return}
+  // ── BUG FIX: check against myCode (your own host code), NOT roomCode ──
+  if(code===myCode&&isHost){toast("That's your own room!",'wn');return}
+
+  const gen=++bootGen; // invalidate any pending boot callbacks
   showSc('si');setStatus('Joining '+code+'…');
-  if(myPeer){myPeer.destroy();myPeer=null}
-  myId=null;isHost=false;members={};hostConns={};peerConns={};selPeer=null;recvState={};connTypes={};
+
+  if(myPeer)try{myPeer.destroy()}catch(e){}
+  myPeer=null;myId=null;isHost=false;
+  members={};hostConns={};peerConns={};selPeer=null;recvState={};connTypes={};latencies={};
+  xferQueues={};xferActive={};pendSends={};pausedXfers.clear();xfers={};
+
   await initMember();
-  myCode=code;
+  // ── KEY FIX: myCode keeps undefined for members (host's code goes into roomCode) ──
+  myCode=null;
+  roomCode=code;
+
   const hid=PFX+code;
   const c=myPeer.connect(hid,{reliable:true,serialization:'binary'});
   hostConn=c;
-  c.on('open',()=>{c.send(JSON.stringify({t:'hs',name:myName,av:myAv}));enterRoom(code);toast('✅ Joined room '+code,'ok');setTimeout(()=>detectConnType(c),3000)});
+  c.on('open',()=>{
+    c.send(JSON.stringify({t:'hs',name:myName,av:myAv}));
+    enterRoom(code);
+    toast('✅ Joined room '+code,'ok');
+    setTimeout(()=>detectConnType(c),3000);
+  });
   c.on('data',d=>{if(typeof d==='string'){try{handleMemberData(JSON.parse(d))}catch(e){}}else handleChunk(d,hid)});
   c.on('close',()=>{toast('Host disconnected','er');leaveRoom()});
   c.on('error',e=>{
     if(e.type==='peer-unavailable')toast('Room "'+code+'" not found — check the code','er');
     else toast('Connection error: '+e.type,'er');
-    showLobby();
+    if(bootGen===gen)showLobby();
   });
-  setTimeout(()=>{if(myCode===code&&!document.getElementById('sr').classList.contains('active')){toast('Could not connect — check the code','er');showLobby()}},16000);
+  setTimeout(()=>{
+    if(bootGen===gen&&!document.getElementById('sr').classList.contains('active')){
+      toast('Could not connect — check the code','er');
+      if(bootGen===gen)showLobby();
+    }
+  },16000);
 }
 
 function handleMemberData(m){
-  if(m.t==='members'){
-    m.list.forEach(mb=>{if(mb.id===myId)return;members[mb.id]={name:mb.name,av:mb.av||'📱',host:!!mb.host};if(!mb.host&&!peerConns[mb.id])connectDirect(mb.id)});
+  if(m.t==='ping'){if(hostConn?.open)hostConn.send(JSON.stringify({t:'pong',ts:m.ts}))}
+  else if(m.t==='pong'){const pid=PFX+roomCode;latencies[pid]=Date.now()-m.ts;updatePingBadge(pid)}
+  else if(m.t==='members'){
+    m.list.forEach(mb=>{
+      if(mb.id===myId)return;
+      members[mb.id]={name:mb.name,av:mb.av||'📱',host:!!mb.host};
+      if(!mb.host&&!peerConns[mb.id])connectDirect(mb.id);
+    });
     refreshList();
   } else if(m.t==='join'){
-    if(m.id===myId)return;members[m.id]={name:m.name||'…',av:m.av||'📱'};
-    if(!peerConns[m.id])connectDirect(m.id);refreshList();toast('📱 '+m.name+' joined');
+    if(m.id===myId)return;
+    members[m.id]={name:m.name||'…',av:m.av||'📱'};
+    if(!peerConns[m.id])connectDirect(m.id);
+    refreshList();toast('📱 '+m.name+' joined');
   } else if(m.t==='upd'){
     if(members[m.id]){members[m.id].name=m.name;members[m.id].av=m.av||members[m.id].av;refreshList()}
   } else if(m.t==='leave'){
-    delete members[m.id];delete peerConns[m.id];delete connTypes[m.id];if(selPeer===m.id)clearSel();refreshList();
-  } else handleFileMsg(m,PFX+myCode,hostConn);
+    delete members[m.id];delete peerConns[m.id];delete connTypes[m.id];delete latencies[m.id];
+    if(selPeer===m.id)clearSel();refreshList();
+  } else handleFileMsg(m,PFX+roomCode,hostConn);
 }
 
 function connectDirect(tid){
@@ -771,17 +756,18 @@ function connectDirect(tid){
   c.on('open',()=>{peerConns[tid]=c;c.send(JSON.stringify({t:'hs',name:myName,av:myAv}));setupDirectConn(c);refreshList();setTimeout(()=>detectConnType(c),3000)});
   c.on('error',()=>{});
 }
-
 function setupDirectConn(c){
   const pid=c.peer;
   c.on('open',()=>{if(!peerConns[pid])peerConns[pid]=c});
   c.on('data',d=>{
-    if(typeof d==='string'){
-      try{const m=JSON.parse(d);
-        if(m.t==='hs'){if(!members[pid])members[pid]={name:m.name,av:m.av||'📱'};else{members[pid].name=m.name;members[pid].av=m.av||'📱'}refreshList()}
-        else handleFileMsg(m,pid,c);
-      }catch(e){}
-    } else handleChunk(d,pid);
+    if(typeof d==='string'){try{
+      const m=JSON.parse(d);
+      if(m.t==='ping'){c.send(JSON.stringify({t:'pong',ts:m.ts}))}
+      else if(m.t==='pong'){latencies[pid]=Date.now()-m.ts;updatePingBadge(pid)}
+      else if(m.t==='hs'){if(!members[pid])members[pid]={name:m.name,av:m.av||'📱'};else{members[pid].name=m.name;members[pid].av=m.av||'📱'}refreshList()}
+      else handleFileMsg(m,pid,c);
+    }catch(e){}}
+    else handleChunk(d,pid);
   });
   c.on('close',()=>{delete peerConns[pid];if(selPeer===pid)clearSel()});
   c.on('error',()=>{});
@@ -790,28 +776,42 @@ function setupDirectConn(c){
 /* ── File transfer ── */
 function handleFileMsg(m,pid,c){
   if(m.t==='fstart'){
-    recvState[pid]={meta:m,chunks:[],got:0,t0:Date.now(),tid:m.tid,c};pendIn={pid,meta:m,c};
+    recvState[pid]={meta:m,chunks:[],got:0,t0:Date.now(),tid:m.tid,c};
+    pendIn={pid,meta:m,c};
     const mb=members[pid]||{name:'Unknown'};
     document.getElementById('mfrm').textContent='From: '+(mb.name||shortI(pid));
-    document.getElementById('mfl').textContent=m.name;document.getElementById('msz').textContent=fmtSz(m.size);
+    document.getElementById('mfl').textContent=m.name;
+    document.getElementById('msz').textContent=fmtSz(m.size);
     document.getElementById('mico').textContent=ficon(m.name,m.mime);
     document.getElementById('mw').classList.add('show');
   } else if(m.t==='facc'){
-    const p=pendSends[m.tid];if(p){sendChunks(p.c,p.f,m.tid);delete pendSends[m.tid]}
-  } else if(m.t==='fdec'){setXfer(m.tid,'fl',0,0,'Declined');toast('File declined','er')}
-  else if(m.t==='fend'){
+    const p=pendSends[m.tid];
+    if(p){
+      const onDone=p.onDone;delete pendSends[m.tid];
+      sendChunks(p.c,p.f,m.tid).then(()=>{if(onDone)onDone()});
+    }
+  } else if(m.t==='fdec'){
+    setXfer(m.tid,'fl',0,0,'Declined');toast('File declined','er');
+    const p=pendSends[m.tid];if(p){const onDone=p.onDone;delete pendSends[m.tid];if(onDone)onDone()}
+  } else if(m.t==='fend'){
     const s=recvState[pid];if(!s)return;
     const blob=new Blob(s.chunks,{type:s.meta.mime||'application/octet-stream'});
-    const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=s.meta.name;
-    document.body.appendChild(a);a.click();setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},5000);
-    setXfer(s.tid,'dn',100,0);toast('📥 Saved: '+s.meta.name,'ok');delete recvState[pid];
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=s.meta.name;
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},5000);
+    setXfer(s.tid,'dn',100,0);toast('📥 Saved: '+s.meta.name,'ok');
+    delete recvState[pid];
   }
 }
 function handleChunk(data,pid){
   const s=recvState[pid];if(!s)return;
   s.chunks.push(data);s.got+=data.byteLength;
+  // Track receive speed for graph
+  lastSpeedBytes+=data.byteLength;
   const pct=Math.min(99,Math.round(s.got/s.meta.size*100));
-  const spd=s.got/((Date.now()-s.t0)/1000||.001);setXfer(s.tid,'recv',pct,spd);
+  const spd=s.got/((Date.now()-s.t0)/1000||.001);
+  setXfer(s.tid,'recv',pct,spd);
 }
 function accFile(){
   document.getElementById('mw').classList.remove('show');if(!pendIn)return;
@@ -820,49 +820,233 @@ function accFile(){
 }
 function decFile(){
   document.getElementById('mw').classList.remove('show');if(!pendIn)return;
-  pendIn.c.send(JSON.stringify({t:'fdec',tid:pendIn.meta.tid}));delete recvState[pendIn.pid];pendIn=null;
+  pendIn.c.send(JSON.stringify({t:'fdec',tid:pendIn.meta.tid}));
+  delete recvState[pendIn.pid];pendIn=null;
 }
 function getConn(pid){
   if(isHost)return hostConns[pid];
   if(peerConns[pid])return peerConns[pid];
-  if(hostConn&&pid===PFX+myCode)return hostConn;
+  // ── KEY FIX: use roomCode (host's code) not myCode ──
+  if(hostConn&&pid===PFX+roomCode)return hostConn;
   return null;
 }
-function sendFile(f){
-  if(!selPeer){toast('Select a device first','er');return}
-  const c=getConn(selPeer);if(!c||!c.open){toast('Not connected to that device yet','er');return}
-  const tid=rid();
-  c.send(JSON.stringify({t:'fstart',tid,name:f.name,size:f.size,mime:f.type||'application/octet-stream'}));
-  addXfer(tid,{name:f.name,size:f.size,mime:f.type,dir:'out'});
-  pendSends[tid]={c,f};
+
+/* ── Transfer queue ── */
+function queueFiles(files,peerId){
+  if(!peerId){toast('Select a device first','er');return}
+  const c=getConn(peerId);if(!c||!c.open){toast('Not connected to that device','er');return}
+  if(!xferQueues[peerId])xferQueues[peerId]=[];
+  files.forEach(f=>{
+    const tid=rid();
+    xferQueues[peerId].push({f,tid});
+    addXfer(tid,{name:f.name,size:f.size,mime:f.type,dir:'out'});
+    if(xferQueues[peerId].length>1)setXfer(tid,'que',0,0,'Queued');
+  });
+  drainQueue(peerId);
 }
+
+function drainQueue(peerId){
+  if(xferActive[peerId])return;
+  const q=xferQueues[peerId];
+  if(!q||!q.length)return;
+  xferActive[peerId]=true;
+  const{f,tid}=q[0];
+  const c=getConn(peerId);
+  if(!c||!c.open){xferActive[peerId]=false;return}
+  c.send(JSON.stringify({t:'fstart',tid,name:f.name,size:f.size,mime:f.type||'application/octet-stream'}));
+  pendSends[tid]={c,f,peerId,onDone:()=>{
+    q.shift();xferActive[peerId]=false;
+    drainQueue(peerId);
+  }};
+}
+
 async function sendChunks(c,f,tid){
   setXfer(tid,'send',0,0);
   const tot=Math.ceil(f.size/CHUNK);let sent=0;const t0=Date.now();
   for(let i=0;i<tot;i++){
+    // Pause support
+    while(pausedXfers.has(tid)){await slp(120)}
     if(c.dataChannel)while(c.dataChannel.bufferedAmount>16*1024*1024)await slp(10);
     const buf=await f.slice(i*CHUNK,(i+1)*CHUNK).arrayBuffer();
     c.send(buf);sent+=buf.byteLength;
-    setXfer(tid,'send',Math.round(sent/f.size*100),sent/((Date.now()-t0)/1000||.001));
+    lastSpeedBytes+=buf.byteLength; // for graph
+    const pct=Math.round(sent/f.size*100);
+    const spd=sent/((Date.now()-t0)/1000||.001);
+    setXfer(tid,'send',pct,spd);
   }
-  c.send(JSON.stringify({t:'fend',tid}));setXfer(tid,'dn',100,0);toast('✅ Sent: '+f.name,'ok');
+  c.send(JSON.stringify({t:'fend',tid}));
+  setXfer(tid,'dn',100,0);toast('✅ Sent: '+f.name,'ok');
+}
+
+function togglePause(tid){
+  if(pausedXfers.has(tid)){
+    pausedXfers.delete(tid);
+    const btn=document.getElementById('tpbtn'+tid);if(btn)btn.textContent='⏸';
+    // remove paused class
+    const item=document.getElementById('t'+tid);if(item){item.classList.remove('pau')}
+    const fill=document.getElementById('tf'+tid);if(fill)fill.classList.remove('pau');
+    const badge=document.getElementById('tb'+tid);if(badge){badge.textContent='…';badge.className='tbdg'}
+  } else {
+    pausedXfers.add(tid);
+    const btn=document.getElementById('tpbtn'+tid);if(btn)btn.textContent='▶';
+    const item=document.getElementById('t'+tid);if(item)item.classList.add('pau');
+    const fill=document.getElementById('tf'+tid);if(fill)fill.classList.add('pau');
+    const badge=document.getElementById('tb'+tid);if(badge){badge.textContent='Paused';badge.className='tbdg pau'}
+  }
+}
+
+/* ── Auto-zip ── */
+async function processFiles(fileList,peerId){
+  const files=Array.from(fileList);
+  if(files.length===0)return;
+  if(files.length===1){queueFiles(files,peerId);return}
+  // Multiple files → auto-zip
+  toast('📦 Zipping '+files.length+' files…','wn');
+  try{
+    const zip=new JSZip();
+    for(const f of files)zip.file(f.name,f);
+    const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}},meta=>{
+      // Could show progress but keep it simple
+    });
+    const zipName='nexshare-'+files.length+'-files.zip';
+    const zipFile=new File([blob],zipName,{type:'application/zip'});
+    toast('✅ Zipped — sending '+fmtSz(zipFile.size),'ok');
+    queueFiles([zipFile],peerId);
+  }catch(e){
+    toast('Zip failed — sending separately','wn');
+    queueFiles(files,peerId);
+  }
 }
 
 /* ── Transfer UI ── */
+let xferCount=0;
 function addXfer(id,info){
-  xfers[id]=info;document.getElementById('twrap').style.display='block';
-  const el=document.createElement('div');el.className='ti '+(info.dir==='inc'?'inc':'');el.id='t'+id;
-  el.innerHTML=`<div class="tbg" id="tbg${id}" style="width:0%"></div><div class="tico">${ficon(info.name,info.mime)}</div><div class="tinf"><div class="tnm">${esc(info.name)}</div><div class="tmt"><span>${fmtSz(info.size)}</span><span id="tspd${id}"></span><span style="color:${info.dir==='inc'?'var(--ok)':'var(--p3)'}">${info.dir==='inc'?'↓ In':'↑ Out'}</span></div><div class="tbar"><div class="tfil" id="tf${id}" style="width:0%"></div></div></div><div class="tbdg" id="tb${id}">Waiting</div>`;
+  xfers[id]=info;
+  xferCount++;
+  document.getElementById('twrap').style.display='block';
+  document.getElementById('t-count').textContent=xferCount;
+  document.getElementById('t-clear-btn').style.display='';
+  document.getElementById('graph-wrap').style.display='';
+  const isPausable=info.dir==='out';
+  const el=document.createElement('div');
+  el.className='ti '+(info.dir==='inc'?'inc':'');el.id='t'+id;
+  el.innerHTML=`
+    <div class="tbg" id="tbg${id}" style="width:0%"></div>
+    <div class="tico">${ficon(info.name,info.mime)}</div>
+    <div class="tinf">
+      <div class="tnm">${esc(info.name)}</div>
+      <div class="tmt">
+        <span>${fmtSz(info.size)}</span>
+        <span id="tspd${id}"></span>
+        <span style="color:${info.dir==='inc'?'var(--ok)':'var(--p3)'}">${info.dir==='inc'?'↓ In':'↑ Out'}</span>
+      </div>
+      <div class="tbar"><div class="tfil" id="tf${id}" style="width:0%"></div></div>
+    </div>
+    <div class="t-right">
+      <div class="tbdg" id="tb${id}">Waiting</div>
+      ${isPausable?`<button class="t-pause-btn" id="tpbtn${id}" onclick="togglePause('${id}')">⏸</button>`:''}
+    </div>`;
   document.getElementById('tlist').prepend(el);
 }
+
 function setXfer(id,st,pct,spd,lbl){
-  const f=document.getElementById('tf'+id),b=document.getElementById('tb'+id),bg=document.getElementById('tbg'+id),sp=document.getElementById('tspd'+id);
-  if(!f)return;f.style.width=pct+'%';if(bg)bg.style.width=pct+'%';
-  if(sp&&spd>0)sp.textContent=fmtSz(spd)+'/s';
-  const lbls={wait:'Waiting',send:pct+'%',recv:pct+'%',dn:'Done ✓',fl:lbl||'Failed'};
-  b.textContent=lbls[st]||st;b.className='tbdg'+(st==='dn'?' dn':st==='fl'?' fl':'');
-  if(st==='dn'){f.classList.add('dn');const item=document.getElementById('t'+id);if(item)item.className='ti dn'}
+  const f=document.getElementById('tf'+id),b=document.getElementById('tb'+id),
+        bg=document.getElementById('tbg'+id),sp=document.getElementById('tspd'+id);
+  if(!f)return;
+  f.style.width=pct+'%';if(bg)bg.style.width=pct+'%';
+  if(sp&&spd>0){sp.textContent=fmtSz(spd)+'/s'}
+  if(pausedXfers.has(id))return; // don't overwrite paused state
+  const lbls={wait:'Waiting',send:pct+'%',recv:pct+'%',dn:'Done ✓',fl:lbl||'Failed',que:'Queued'};
+  b.textContent=lbls[st]||st;
+  b.className='tbdg'+(st==='dn'?' dn':st==='fl'?' fl':st==='que'?' que':'');
+  if(st==='dn'){f.classList.add('dn');const item=document.getElementById('t'+id);if(item){item.className='ti dn';const pb=document.getElementById('tpbtn'+id);if(pb)pb.remove()}}
   if(st==='fl'){const item=document.getElementById('t'+id);if(item)item.className='ti fl'}
+}
+
+function clearDoneXfers(){
+  document.querySelectorAll('.ti.dn,.ti.fl').forEach(el=>{
+    const id=el.id.slice(1);delete xfers[id];el.remove();xferCount--;
+  });
+  document.getElementById('t-count').textContent=xferCount;
+  if(!Object.keys(xfers).length){document.getElementById('twrap').style.display='none';document.getElementById('t-clear-btn').style.display='none'}
+}
+
+/* ── Speed graph ── */
+function startGraphLoop(){
+  setInterval(()=>{
+    const now=Date.now();
+    const elapsed=(now-lastSpeedTime)/1000||1;
+    const speed=lastSpeedBytes/elapsed;
+    lastSpeedBytes=0;lastSpeedTime=now;
+    speedSamples.push(speed);speedSamples.shift();
+    if(speed>peakSpeed)peakSpeed=speed;
+    drawGraph();
+    // Update UI labels
+    document.getElementById('g-cur').textContent=fmtSz(speed)+'/s';
+    if(peakSpeed>0)document.getElementById('g-peak').textContent='Peak: '+fmtSz(peakSpeed)+'/s';
+  },1000);
+}
+
+function drawGraph(){
+  const canvas=document.getElementById('speed-canvas');
+  if(!canvas||canvas.offsetParent===null)return;
+  canvas.width=canvas.offsetWidth*devicePixelRatio||600;
+  canvas.height=canvas.offsetHeight*devicePixelRatio||52;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const max=Math.max(...speedSamples,1);
+  const pts=speedSamples.map((v,i)=>[i/59*W,H-v/max*(H*0.85)-H*0.05]);
+  // Fill
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgba(168,85,247,.35)');grad.addColorStop(1,'rgba(168,85,247,.02)');
+  ctx.beginPath();ctx.moveTo(pts[0][0],H);
+  pts.forEach(p=>ctx.lineTo(p[0],p[1]));
+  ctx.lineTo(pts[pts.length-1][0],H);ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+  // Line
+  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]));
+  ctx.strokeStyle='rgba(168,85,247,.8)';ctx.lineWidth=1.5*devicePixelRatio;
+  ctx.lineJoin='round';ctx.stroke();
+}
+
+/* ── Ping system ── */
+function startPingLoop(){
+  setInterval(()=>{
+    const msg=JSON.stringify({t:'ping',ts:Date.now()});
+    Object.values(hostConns).forEach(c=>{try{c.send(msg)}catch(e){}});
+    if(hostConn?.open)try{hostConn.send(msg)}catch(e){};
+    Object.values(peerConns).forEach(c=>{try{c.send(msg)}catch(e){}});
+  },5000);
+}
+function updatePingBadge(pid){
+  const ms=latencies[pid];if(ms==null)return;
+  const el=document.getElementById('ping-'+pid.replace(/[^a-z0-9]/gi,'_'));
+  if(!el)return;
+  const cls=ms<50?'ping-ok':ms<150?'ping-warn':'ping-bad';
+  el.textContent=ms+'ms';el.className='ping-badge '+cls;
+}
+
+/* ── Network quality ── */
+async function detectConnType(conn){
+  if(!conn?.peerConnection)return;
+  try{
+    const stats=await conn.peerConnection.getStats();
+    stats.forEach(r=>{
+      if(r.type==='candidate-pair'&&r.state==='succeeded'){
+        const local=stats.get(r.localCandidateId);
+        if(local){connTypes[conn.peer]=local.candidateType==='relay'?'relay':'direct';updateNetIndicator()}
+      }
+    });
+  }catch(e){}
+}
+function updateNetIndicator(){
+  const el=document.getElementById('net-indicator');if(!el)return;
+  const types=Object.values(connTypes);if(!types.length)return;
+  const relay=types.includes('relay');
+  el.innerHTML=relay
+    ?'<span class="net-badge net-relay">⚡ Relay</span>'
+    :'<span class="net-badge net-direct">⚡ Direct</span>';
 }
 
 /* ── Device list ── */
@@ -883,36 +1067,49 @@ function refreshList(){
     if(ex){ex.querySelector('.dn').textContent=m.name||'Unknown';ex.querySelector('.dav').textContent=m.av||'📱'}
     else{
       const d=document.createElement('div');d.className='dcard'+(selPeer===pid?' sel':'');d.id=safeId;d.dataset.pid=pid;
-      d.innerHTML=`<span class="dav">${m.av||'📱'}</span><div class="dn">${esc(m.name||'Unknown')}</div><div class="dt">${m.host?'Host':'Member'}</div><div class="dc">● Online</div>`;
-      d.onclick=()=>selDev(pid,m.name||'Unknown',m.av||'📱');grid.appendChild(d);
+      d.innerHTML=`<span class="dav">${m.av||'📱'}</span><div class="dn">${esc(m.name||'Unknown')}</div><div class="dt">${m.host?'Host':'Member'}</div><div class="dc">● Online</div><div id="ping-${pid.replace(/[^a-z0-9]/gi,'_')}" class="ping-badge"></div>`;
+      d.onclick=()=>selDev(pid,m.name||'Unknown',m.av||'📱');
+      grid.appendChild(d);
     }
   });
   updateDZ();
 }
 function selDev(pid,name,av){
-  selPeer=pid;document.querySelectorAll('.dcard').forEach(c=>c.classList.toggle('sel',c.dataset.pid===pid));
-  document.getElementById('sbar').style.display='flex';document.getElementById('snm').textContent=name;document.getElementById('sav').textContent=av;updateDZ();
+  selPeer=pid;
+  document.querySelectorAll('.dcard').forEach(c=>c.classList.toggle('sel',c.dataset.pid===pid));
+  document.getElementById('sbar').style.display='flex';
+  document.getElementById('snm').textContent=name;
+  document.getElementById('sav').textContent=av;
+  updateDZ();
 }
-function clearSel(){selPeer=null;document.querySelectorAll('.dcard').forEach(c=>c.classList.remove('sel'));document.getElementById('sbar').style.display='none';updateDZ()}
+function clearSel(){
+  selPeer=null;
+  document.querySelectorAll('.dcard').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('sbar').style.display='none';
+  updateDZ();
+}
 function updateDZ(){
   const dz=document.getElementById('dzone'),t=document.getElementById('dtit'),s=document.getElementById('dsub'),b=document.getElementById('dzb');
   const cnt=Object.keys(members).length;
   if(cnt===0){dz.className='dz dis';t.textContent='Waiting for devices…';s.textContent='Share your code or link to invite others';b.style.display='none'}
   else if(!selPeer){dz.className='dz';t.textContent='Tap a device to select';s.textContent='Then drop files here or click Choose';b.style.display='none'}
-  else{dz.className='dz rdy adz';const m=members[selPeer];t.textContent='Drop files to send to '+(m?m.name:'device');s.textContent='Or click Choose Files below';b.style.display='flex'}
+  else{dz.className='dz rdy adz';const m=members[selPeer];t.textContent='Drop files → '+(m?m.name:'device');s.textContent='Multiple files are auto-zipped. Or click Choose.';b.style.display='flex'}
 }
 
 /* ── Drag & Drop ── */
 const dzone=document.getElementById('dzone');
 dzone.addEventListener('dragover',e=>{e.preventDefault();if(selPeer)dzone.classList.add('adz')});
 dzone.addEventListener('dragleave',()=>{if(!selPeer||!dzone.classList.contains('rdy'))dzone.classList.remove('adz')});
-dzone.addEventListener('drop',e=>{e.preventDefault();if(!selPeer){toast('Select a device first','er');return}Array.from(e.dataTransfer.files).forEach(f=>sendFile(f))});
+dzone.addEventListener('drop',e=>{
+  e.preventDefault();
+  if(!selPeer){toast('Select a device first','er');return}
+  processFiles(e.dataTransfer.files,selPeer);
+});
 function pickFiles(folder=false){document.getElementById(folder?'finput-dir':'finput').click()}
-function onPick(files){Array.from(files).forEach(f=>sendFile(f));document.getElementById('finput').value='';document.getElementById('finput-dir').value=''}
+function onPick(files){processFiles(files,selPeer);document.getElementById('finput').value='';document.getElementById('finput-dir').value=''}
 
 /* ── QR Scanner ── */
 let scanStream=null,scanRAF=null,scanDone=false;
-
 async function openQRScanner(){
   if(!navigator.mediaDevices?.getUserMedia){toast('Camera not available in this browser','er');return}
   document.getElementById('qr-scan-modal').classList.add('show');
@@ -922,47 +1119,100 @@ async function openQRScanner(){
     scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:640},height:{ideal:640}}});
     const video=document.getElementById('qr-video');
     video.srcObject=scanStream;video.play();
-    video.onloadedmetadata=()=>startQRDecode();
-  }catch(e){
-    document.getElementById('qsm-status').textContent='Camera permission denied';
-    toast('Camera access denied','er');
-  }
-}
-
-function startQRDecode(){
-  const video=document.getElementById('qr-video'),canvas=document.getElementById('qr-canvas');
-  document.getElementById('qsm-status').textContent='Align the QR code within the frame';
-  function tick(){
-    if(scanDone)return;
-    if(video.readyState===video.HAVE_ENOUGH_DATA){
-      canvas.width=video.videoWidth;canvas.height=video.videoHeight;
-      canvas.getContext('2d').drawImage(video,0,0);
-      const img=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height);
-      const code=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});
-      if(code){
-        // Extract join code from URL or bare code
-        let extracted=code.data;
-        try{const u=new URL(code.data);extracted=u.searchParams.get('join')||extracted}catch(e){}
-        extracted=extracted.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,6);
-        if(extracted.length===6){
-          scanDone=true;
-          document.getElementById('qsm-status').innerHTML='<span class="qsm-found">✓ Found: '+extracted+'</span>';
-          setTimeout(()=>{closeQRScanner();joinRoom(extracted)},600);return;
+    video.onloadedmetadata=()=>{
+      document.getElementById('qsm-status').textContent='Align the QR code within the frame';
+      (function tick(){
+        if(scanDone)return;
+        if(video.readyState===video.HAVE_ENOUGH_DATA){
+          const canvas=document.getElementById('qr-canvas');
+          canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+          canvas.getContext('2d').drawImage(video,0,0);
+          const img=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height);
+          const code=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});
+          if(code){
+            let extracted=code.data;
+            try{const u=new URL(code.data);extracted=u.searchParams.get('join')||extracted}catch(e){}
+            extracted=extracted.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,6);
+            if(extracted.length===6){
+              scanDone=true;
+              document.getElementById('qsm-status').innerHTML='<span class="qsm-found">✓ Found: '+extracted+'</span>';
+              setTimeout(()=>{closeQRScanner();joinRoom(extracted)},600);return;
+            }
+          }
         }
-      }
-    }
-    scanRAF=requestAnimationFrame(tick);
-  }
-  scanRAF=requestAnimationFrame(tick);
+        scanRAF=requestAnimationFrame(tick);
+      })();
+    };
+  }catch(e){document.getElementById('qsm-status').textContent='Camera permission denied';toast('Camera access denied','er')}
 }
-
 function closeQRScanner(){
-  scanDone=true;
-  if(scanRAF)cancelAnimationFrame(scanRAF);
+  scanDone=true;if(scanRAF)cancelAnimationFrame(scanRAF);
   if(scanStream)scanStream.getTracks().forEach(t=>t.stop());
   scanStream=null;
   document.getElementById('qr-scan-modal').classList.remove('show');
   document.getElementById('qr-video').srcObject=null;
+}
+
+/* ── Discovery lobby ── */
+const LOBBY_ID='nxs-global-lobby-v1';
+const LOBBY_TTL=120000;
+
+function startDiscovery(){
+  if(lobbyPeer)try{lobbyPeer.destroy()}catch(e){}
+  lobbyHost=false;lobbyClients={};lobbyConn=null;
+  const lp=new Peer(LOBBY_ID,PCFG);lobbyPeer=lp;
+  lp.on('open',()=>{
+    lobbyHost=true;
+    lp.on('connection',c=>{
+      c.on('open',()=>{lobbyClients[c.peer]=c;c.send(JSON.stringify({t:'rooms',rooms:nearbyRooms}))});
+      c.on('data',d=>{try{const m=JSON.parse(d);if(m.t==='announce'){nearbyRooms[m.code]={name:m.name,av:m.av,ts:Date.now()};pruneRooms();broadcastLobby({t:'rooms',rooms:nearbyRooms});renderNearby()}}catch(e){}});
+      c.on('close',()=>{delete lobbyClients[c.peer]});
+      c.on('error',()=>{delete lobbyClients[c.peer]});
+    });
+    // Announce own room
+    if(myCode)announceToLobby();
+  });
+  lp.on('error',e=>{if(e.type==='unavailable-id')connectToLobby()});
+}
+
+function connectToLobby(){
+  if(!myPeer)return;
+  try{
+    const c=myPeer.connect(LOBBY_ID,{reliable:true});
+    lobbyConn=c;
+    c.on('open',()=>announceToLobby());
+    c.on('data',d=>{try{const m=JSON.parse(d);if(m.t==='rooms'){nearbyRooms=m.rooms||{};renderNearby()}}catch(e){}});
+    c.on('close',()=>{lobbyConn=null});
+    c.on('error',()=>{lobbyConn=null});
+  }catch(e){}
+}
+
+function announceToLobby(){
+  const code=isHost?myCode:null;
+  if(!code)return; // members don't announce
+  const msg=JSON.stringify({t:'announce',code,name:myName,av:myAv,ts:Date.now()});
+  if(lobbyHost){nearbyRooms[code]={name:myName,av:myAv,ts:Date.now()};broadcastLobby({t:'rooms',rooms:nearbyRooms});renderNearby()}
+  else if(lobbyConn?.open)try{lobbyConn.send(msg)}catch(e){}
+}
+
+function broadcastLobby(msg){const s=JSON.stringify(msg);Object.values(lobbyClients).forEach(c=>{try{c.send(s)}catch(e){}})}
+function pruneRooms(){const now=Date.now();Object.keys(nearbyRooms).forEach(k=>{if(now-nearbyRooms[k].ts>LOBBY_TTL)delete nearbyRooms[k]})}
+setInterval(announceToLobby,60000);
+
+function renderNearby(){
+  const list=document.getElementById('nearby-list'),empty=document.getElementById('nearby-empty');
+  pruneRooms();
+  const others=Object.entries(nearbyRooms).filter(([code])=>code!==myCode);
+  if(!others.length){empty.style.display='block';list.querySelectorAll('.nearby-room').forEach(e=>e.remove());return}
+  empty.style.display='none';
+  list.querySelectorAll('.nearby-room').forEach(el=>{if(!nearbyRooms[el.dataset.code])el.remove()});
+  others.forEach(([code,r])=>{
+    if(document.querySelector(`.nearby-room[data-code="${code}"]`))return;
+    const el=document.createElement('div');el.className='nearby-room';el.dataset.code=code;
+    el.innerHTML=`<span class="nr-av">${r.av||'💻'}</span><div class="nr-info"><div class="nr-name">${esc(r.name||'Unknown')}</div><div class="nr-meta">Room <span class="nr-code">${code}</span> · Active now</div></div><span class="nr-join">Join →</span>`;
+    el.onclick=()=>joinRoom(code);
+    list.insertBefore(el,list.firstChild);
+  });
 }
 
 /* ── Screens ── */
@@ -975,8 +1225,7 @@ function showLobby(){
   document.getElementById('msgcode').textContent=code;
   document.getElementById('dev-status-txt').textContent='Ready · Code: '+code;
   genQR();showSc('sl');
-  // Announce to lobby discovery
-  setTimeout(announceToLobby,1000);
+  setTimeout(announceToLobby,800);
 }
 
 function enterRoom(code){
@@ -984,43 +1233,57 @@ function enterRoom(code){
   document.getElementById('ri-code').textContent=code;
   document.getElementById('msgcode').textContent=code;
   const old=document.getElementById('dc_you');if(old)old.remove();
+  // For members: show the host in device list
   if(!isHost){const hid=PFX+code;if(!members[hid])members[hid]={name:'Room Host',av:'💻',host:true}}
-  document.getElementById('tlist').innerHTML='';document.getElementById('twrap').style.display='none';
+  document.getElementById('tlist').innerHTML='';
+  document.getElementById('twrap').style.display='none';
+  document.getElementById('graph-wrap').style.display='none';
   document.getElementById('net-indicator').innerHTML='';
+  xferCount=0;document.getElementById('t-count').textContent='0';
+  speedSamples=Array(60).fill(0);peakSpeed=0;
   refreshList();showSc('sr');
-  // Only the host announces to lobby. Members never overwrite myCode.
-  if(isHost) announceToLobby();
+  // Only hosts announce to discovery — members keep their myCode=null
+  if(isHost)announceToLobby();
 }
 
 function joinFromOTP(){
-  const code=getOTP();if(code.length!==6){toast('Enter a full 6-letter code','er');return}joinRoom(code);
+  const code=getOTP();if(code.length!==6){toast('Enter a full 6-letter code','er');return}
+  joinRoom(code);
 }
 
 function leaveRoom(){
+  showSc('si');setStatus('Returning to lobby…');
   if(myPeer)try{myPeer.destroy()}catch(e){}
-  myPeer=null;myId=null;isHost=false;
-  members={};hostConns={};hostConn=null;peerConns={};selPeer=null;pendIn=null;pendSends={};xfers={};recvState={};connTypes={};
+  myPeer=null;myId=null;isHost=false;myCode=null;roomCode=null;
+  members={};hostConns={};hostConn=null;peerConns={};selPeer=null;pendIn=null;
+  recvState={};connTypes={};latencies={};
+  xferQueues={};xferActive={};pendSends={};pausedXfers.clear();xfers={};xferCount=0;
   document.getElementById('sbar').style.display='none';
   document.getElementById('mw').classList.remove('show');
   document.getElementById('dgrid').innerHTML='';
   document.getElementById('dgrid').appendChild(document.getElementById('nodmsg'));
   document.getElementById('nodmsg').style.display='block';
   buildOTP();
-  // Show init immediately so there's feedback
-  showSc('si');setStatus('Returning to lobby…');
-  myCode=null;
-  // Build fresh host peer, THEN show lobby (avoids race condition)
-  tryHost().then(()=>showLobby()).catch(()=>initMember().then(()=>showLobby()));
+  // ── KEY FIX: increment bootGen so any in-flight join/boot can't accidentally
+  // call showLobby after we've already started a new joinRoom ──
+  const gen=++bootGen;
+  tryHost()
+    .then(()=>{if(bootGen===gen)showLobby()})
+    .catch(()=>initMember().then(()=>{if(bootGen===gen)showLobby()}));
 }
 
-/* ── QR generation ── */
+/* ── QR ── */
 function genQR(){
   const w=document.getElementById('qwrap');w.innerHTML='';if(!myCode)return;
   new QRCode(w,{text:`${location.origin}${location.pathname}?join=${myCode}`,width:115,height:115,colorDark:'#160040',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
 }
-function copyCode(){if(!myCode)return;navigator.clipboard.writeText(myCode).then(()=>toast('📋 Copied: '+myCode,'ok'))}
+function copyCode(){
+  const code=myCode||roomCode;if(!code)return;
+  navigator.clipboard.writeText(code).then(()=>toast('📋 Copied: '+code,'ok'));
+}
 function shareLink(){
-  const url=`${location.origin}${location.pathname}?join=${myCode}`;
+  const code=myCode||roomCode;if(!code)return;
+  const url=`${location.origin}${location.pathname}?join=${code}`;
   if(navigator.share)navigator.share({title:'Join my NexShare room',url});
   else navigator.clipboard.writeText(url).then(()=>toast('🔗 Link copied!','ok'));
 }
