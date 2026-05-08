@@ -1833,25 +1833,29 @@ function joinFromOTP(){
 }
 
 function leaveRoom(){
-  showSc('si');setStatus('Returning to lobby…');
+  // Show lobby IMMEDIATELY — never show the init/spinner screen on leave
+  const gen=++bootGen;
   if(pendingPeer){try{pendingPeer.destroy()}catch(e){}pendingPeer=null;}
-  if(myPeer)try{myPeer.destroy()}catch(e){}
-  myPeer=null;myId=null;isHost=false;myCode=null;roomCode=null;
+  if(myPeer){try{myPeer.destroy()}catch(e){}myPeer=null;}
+  myId=null;isHost=false;myCode=null;roomCode=null;
   members={};hostConns={};hostConn=null;peerConns={};selPeer=null;pendIn=null;
   recvState={};connTypes={};latencies={};
   xferQueues={};xferActive={};pendSends={};pausedXfers.clear();xfers={};xferCount=0;
-  document.getElementById('sbar').style.display='none';
-  document.getElementById('mw').classList.remove('show');
-  document.getElementById('dgrid').innerHTML='';
-  document.getElementById('dgrid').appendChild(document.getElementById('nodmsg'));
-  document.getElementById('nodmsg').style.display='block';
+  // Reset any room-screen UI that may be open
+  try{document.getElementById('sbar').style.display='none'}catch(e){}
+  try{document.getElementById('mw').classList.remove('show')}catch(e){}
+  try{
+    const grid=document.getElementById('dgrid'),nm=document.getElementById('nodmsg');
+    if(grid&&nm){grid.innerHTML='';grid.appendChild(nm);nm.style.display='block';}
+  }catch(e){}
   buildOTP();
-  // ── KEY FIX: increment bootGen so any in-flight join/boot can't accidentally
-  // call showLobby after we've already started a new joinRoom ──
-  const gen=++bootGen;
+  // Show lobby right now with a faint placeholder code while peer rebuilds
+  try{document.getElementById('mycode').innerHTML='<span style="opacity:.25;letter-spacing:.25em">------</span>';}catch(e){}
+  showSc('sl');  // <-- lobby, not init screen
+  // Rebuild host peer silently in background, update code when ready
   tryHost()
-    .then(()=>{if(bootGen===gen)showLobby()})
-    .catch(()=>initMember().then(()=>{if(bootGen===gen)showLobby()}));
+    .then(()=>{if(bootGen===gen)showLobby();})
+    .catch(()=>initMember().then(()=>{if(bootGen===gen)showLobby();}));
 }
 
 /* ── QR ── */
